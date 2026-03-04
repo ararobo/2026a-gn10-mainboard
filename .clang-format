@@ -1,0 +1,43 @@
+# Googleをベースにカスタムする
+BasedOnStyle: Google
+# 過度な改行はしない
+ColumnLimit: 100
+# インデントはROS2標準に合わせ横幅節約
+IndentWidth: 4
+# クラスのアクセスは明確に
+AccessModifierOffset: -4
+
+
+# コンストラクタの初期化リストを次行に配置し、可読性を向上させる
+PackConstructorInitializers: NextLine
+# 文字列を分割しないようにする
+BreakStringLiterals: false
+
+# 関数とクラスには明確な区切り、処理には繋がりを
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterClass:            true
+    AfterFunction:         true
+    AfterNamespace:        false
+    AfterControlStatement: false
+    BeforeCatch:           false
+    BeforeElse:            false
+
+# 開き括弧後に改行し、閉じ括弧に揃えてインデント
+AlignAfterOpenBracket: BlockIndent
+# 1行にパラメータを詰め込まず、1行1変数
+BinPackParameters:     false
+BinPackArguments:      false
+
+# マクロはSTM32向けに縦を揃える
+AlignConsecutiveMacros: Consecutive
+# ビットフィールドは縦のつながりがあるので揃える
+AlignConsecutiveBitFields: Consecutive
+# 設定値やパラメータの代入は、視認性向上のため縦に揃える
+AlignConsecutiveAssignments: true
+
+# 配列は右揃えにして値をわかりやすくする
+AlignArrayOfStructures: Right
+
+# 関数をインライン表記してよいのは空のときだけ
+AllowShortFunctionsOnASingleLine: Empty

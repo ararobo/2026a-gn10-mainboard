@@ -1,0 +1,24 @@
+{
+    "C_Cpp.default.cppStandard": "c++17",
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "cpp": false,
+        "c": false
+    },
+    "plantuml.exportFormat": "png",
+    "plantuml.exportOutDir": "docs/uml/",
+    "plantuml.diagramsRoot": "docs/uml/",
+    "plantuml.exportSubFolder": false,
+    "[cpp]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "[c]": {
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+    "C_Cpp.clang_format_style": "file"
+}
