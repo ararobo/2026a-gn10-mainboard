@@ -1,0 +1,79 @@
+name: CI Build
+
+# main へのプッシュ・PR・手動実行でビルドチェックを行う
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# リポジトリ読み取りのみ許可
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+# 同一ブランチへの連続プッシュ時は古いジョブをキャンセルしてリソースを節約する
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Check Format
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+
+    # CubeMX生成ファイル(Core/)とサブモジュール(external/)は除外する
+    - name: Check formatting
+      run: >
+        find gn10_mainboard gn10_can
+        \( -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" \)
+        | xargs clang-format --dry-run --Werror
+
+  build:
+    name: Build gn10-mainboard
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        # 外部ライブラリ(gn10_can 等)をサブモジュールとして取得する
+        submodules: recursive
+
+    - name: Install Arm Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+
+    # ビルドキャッシュ: ターゲットごとにキーを分けて他ターゲットのキャッシュと混在させない
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: gn10-mainboard
+        variant: ccache
+
+    # CMakePresets.json の Release プリセットを使用してコンフィグ・ビルドする
+    - name: Configure CMake
+      run: cmake --preset Release
+
+    - name: Build
+      run: cmake --build --preset Release
+
+    # プリセット使用時はビルド出力が build/<preset-name>/ 以下に生成されるため再帰パターンで収集する
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-gn10-mainboard
+        path: |
+          build/**/*.bin
+          build/**/*.elf
