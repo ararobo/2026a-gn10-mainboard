@@ -1,0 +1,79 @@
+name: Release Firmware
+
+# v* タグのプッシュ時にリリースビルドを作成する (例: v1.0.0)
+on:
+  push:
+    tags:
+      - 'v*'
+
+defaults:
+  run:
+    shell: bash
+
+# ワークフロー全体のデフォルト権限を最小化する
+permissions: {}
+
+jobs:
+  build:
+    name: Build gn10-mainboard
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        # 外部ライブラリ(gn10_can 等)をサブモジュールとして取得する
+        submodules: recursive
+
+    - name: Install Arm Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+
+    # ビルドキャッシュ: ターゲットごとにキーを分けて他ターゲットのキャッシュと混在させない
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: release-gn10-mainboard
+        variant: ccache
+
+    # CMakePresets.json の Release プリセットを使用してコンフィグ・ビルドする
+    - name: Configure CMake
+      run: cmake --preset Release
+
+    - name: Build
+      run: cmake --build --preset Release
+
+    # 次の release ジョブに渡すため、一時的にアーティファクトとして保存する
+    # プリセット使用時はビルド出力が build/<preset-name>/ 以下に生成されるため再帰パターンで収集する
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-gn10-mainboard
+        path: |
+          build/**/*.bin
+          build/**/*.elf
+
+  release:
+    name: Create Release
+    # 全ボードのビルドが成功した場合のみリリースを作成する
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+    # 全 matrix ジョブの成果物を一つのディレクトリにまとめて展開する
+    - name: Download All Firmware
+      uses: actions/download-artifact@v4
+      with:
+        path: firmware
+        merge-multiple: true
+
+    # タグのコミット差分からリリースノートを自動生成する
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+        files: firmware/**
