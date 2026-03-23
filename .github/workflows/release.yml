@@ -10,7 +10,6 @@ on:
       project_name:
         description: 'Project name for build artifacts'
         required: false
-        default: 'gn10-mainboard' # 各自プロジェクトの名前に変更してください
         type: string
 
 defaults:
@@ -20,12 +19,12 @@ defaults:
 # ワークフロー全体のデフォルト権限を最小化する
 permissions: {}
 
-env:
-  PROJECT_NAME: ${{ github.event.inputs.project_name || 'default-project' }}
-
 jobs:
   build:
-    name: Build ${{ env.PROJECT_NAME }}
+    # project_name 未指定時はリポジトリ名をデフォルトとして使用する
+    name: Build ${{ github.event.inputs.project_name || github.event.repository.name }}
+    env:
+      PROJECT_NAME: ${{ github.event.inputs.project_name || github.event.repository.name }}
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -33,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        # 外部ライブラリ(gn10_can 等)をサブモジュールとして取得する
+        # 外部ライブラリをサブモジュールとして取得する
         submodules: recursive
 
     - name: Install Arm Toolchain
@@ -65,14 +64,14 @@ jobs:
 
   release:
     name: Create Release
-    # 全ボードのビルドが成功した場合のみリリースを作成する
+    # build ジョブが成功した場合のみリリースを作成する
     needs: build
     runs-on: ubuntu-22.04
     permissions:
       contents: write
 
     steps:
-    # 全 matrix ジョブの成果物を一つのディレクトリにまとめて展開する
+    # ビルドジョブの成果物を一つのディレクトリにまとめて展開する
     - name: Download All Firmware
       uses: actions/download-artifact@v4
       with:
