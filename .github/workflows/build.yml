@@ -11,7 +11,6 @@ on:
       project_name:
         description: 'Project name for build artifacts'
         required: false
-        default: 'gn10-mainboard' # 各自プロジェクトの名前に変更してください
         type: string
 
 # リポジトリ読み取りのみ許可
@@ -29,15 +28,16 @@ concurrency:
 
 jobs:
   build:
-    name: Build ${{ github.event.inputs.project_name || 'default-project' }}
+    # project_name 未指定時はリポジトリ名をデフォルトとして使用する
     env:
-      PROJECT_NAME: ${{ github.event.inputs.project_name || 'default-project' }}
+      PROJECT_NAME: ${{ github.event.inputs.project_name || github.event.repository.name }}
+    name: Build ${{ env.PROJECT_NAME }}
     runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4
       with:
-        # 外部ライブラリ(gn10_can 等)をサブモジュールとして取得する
+        # 外部ライブラリをサブモジュールとして取得する
         submodules: recursive
 
     - name: Install Arm Toolchain
@@ -64,5 +64,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: firmware-${{ env.PROJECT_NAME }}
-        path: |
-          build/**/*.elf
+        path: build/**/*.elf
