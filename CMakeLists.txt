@@ -37,6 +37,8 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 # User Application
+set(BUILD_TESTING OFF CACHE BOOL "Disable testing" FORCE)
+set(gtest_disable_pthreads ON CACHE BOOL "Disable pthreads" FORCE)
 add_subdirectory(gn10_can)
 add_subdirectory(gn10_mainboard)
 

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 add_library(gn10_mainboard STATIC
     src/app.cpp
+    src/robomas_can.cpp
     ${CMAKE_SOURCE_DIR}/gn10_can/drivers/stm32_fdcan/driver_stm32_fdcan.cpp
 )
 

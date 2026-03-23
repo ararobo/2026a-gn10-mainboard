@@ -1,4 +1,4 @@
-#include "include/robomaster/robomas_can.hpp"
+#include "gn10_mainboard/robomas_can.hpp"
 
 #include <cstring>
 
@@ -19,7 +19,7 @@ void robomas_can::send_data(uint16_t can_id, uint8_t* data)
 
 void robomas_can::send()
 {
-     send_data(SEND_CANID_1_4, reinterpret_cast<uint8_t*>(&current_1));
+    send_data(SEND_CANID_1_4, reinterpret_cast<uint8_t*>(&current_1));
 
     send_data(SEND_CANID_5_8, reinterpret_cast<uint8_t*>(&current_2));
 }
