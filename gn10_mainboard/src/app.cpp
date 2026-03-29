@@ -4,7 +4,6 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
-#include "gn10_mainboard/robomas_can.hpp"
 
 namespace {
 
@@ -33,8 +32,6 @@ gn10_can::devices::MotorConfig motor1_config;
 
 gn10_can::drivers::DriverSTM32FDCAN can2_driver(&hfdcan2);
 gn10_can::CANBus can2_bus(can2_driver);
-
-robomaster::RobomasCAN rm_can(can2_bus);
 
 float output = 0.0f;
 float accel  = 0.001f;
@@ -74,7 +71,6 @@ void loop()
 
     motor1.set_target(output);
     update_heartbeat_led();
-    rm_can.send_current(0, 20, 0, 0, 0);
     // robomas用の
     HAL_Delay(10);
 }
@@ -85,14 +81,6 @@ extern "C" {
  */
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    if (hfdcan->Instance == FDCAN1) {
-        can1_bus.update();
-    } else if (hfdcan->Instance == FDCAN2) {
-        FDCAN_RxHeaderTypeDef rx_header;
-        uint8_t rx_data[8];
-        if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &rx_header, rx_data) == HAL_OK) {
-            rm_can.receive_data(rx_header.Identifier, rx_data);
-        }
-    }
+    can1_bus.update();
 }
 }
