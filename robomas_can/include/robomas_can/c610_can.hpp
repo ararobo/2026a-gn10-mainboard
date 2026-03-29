@@ -7,7 +7,7 @@ namespace c610 {
 // feedback data
 struct c610_feedback {
     uint16_t angle;     // 値域：0~8191　
-    int16_t speed;      // 値域 -10000 ~ 10000　単位：rpm
+    int16_t speed_rpm;  // 値域 -10000 ~ 10000　単位：rpm
     int16_t current;    // 値域 -10000 ~ 10000
     uint16_t reserved;  // 空きデータ
 } __attribute__((__packed__));

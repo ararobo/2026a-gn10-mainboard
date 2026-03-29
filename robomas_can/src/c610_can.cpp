@@ -11,9 +11,9 @@ void C610CAN::receive_data(uint16_t can_id, uint8_t data[8])
     memcpy(&feedback_[motor_number], data, 8);
 
     // c610はビックエンディアンなのでリトルエンディアンに変換
-    feedback_[motor_number].angle   = __builtin_bswap16(feedback_[motor_number].angle);
-    feedback_[motor_number].speed   = __builtin_bswap16(feedback_[motor_number].speed);
-    feedback_[motor_number].current = __builtin_bswap16(feedback_[motor_number].current);
+    feedback_[motor_number].angle     = __builtin_bswap16(feedback_[motor_number].angle);
+    feedback_[motor_number].speed_rpm = __builtin_bswap16(feedback_[motor_number].speed_rpm);
+    feedback_[motor_number].current   = __builtin_bswap16(feedback_[motor_number].current);
 }
 
 uint16_t C610CAN::get_feedback_angle(uint8_t motor_number) const
@@ -25,7 +25,7 @@ uint16_t C610CAN::get_feedback_angle(uint8_t motor_number) const
 int16_t C610CAN::get_feedback_speed(uint8_t motor_number) const
 {
     if (motor_number < 1 || motor_number > 8) return 0;
-    return feedback_[motor_number - 1].speed;
+    return feedback_[motor_number - 1].speed_rpm;
 }
 
 int16_t C610CAN::get_feedback_current(uint8_t motor_number) const
