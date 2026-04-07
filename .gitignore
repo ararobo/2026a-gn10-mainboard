@@ -60,3 +60,4 @@ Thumbs.db
 _autosave-*
 *.kicad_pcb-bak
 fp-info-cache
+**/.history/
