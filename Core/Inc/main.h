@@ -57,16 +57,34 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define DIP_1_Pin GPIO_PIN_2
+#define DIP_1_GPIO_Port GPIOC
+#define DIP_2_Pin GPIO_PIN_3
+#define DIP_2_GPIO_Port GPIOC
+#define DIP_3_Pin GPIO_PIN_0
+#define DIP_3_GPIO_Port GPIOA
+#define DIP_4_Pin GPIO_PIN_1
+#define DIP_4_GPIO_Port GPIOA
 #define W5500_RST_Pin GPIO_PIN_4
 #define W5500_RST_GPIO_Port GPIOA
 #define SPI1_CS_Pin GPIO_PIN_4
 #define SPI1_CS_GPIO_Port GPIOC
-#define LED_RAD_Pin GPIO_PIN_10
-#define LED_RAD_GPIO_Port GPIOC
-#define LED_GREEN_Pin GPIO_PIN_11
-#define LED_GREEN_GPIO_Port GPIOC
-#define LED_BLUE_Pin GPIO_PIN_12
-#define LED_BLUE_GPIO_Port GPIOC
+#define BLE_UART_MODE_Pin GPIO_PIN_0
+#define BLE_UART_MODE_GPIO_Port GPIOB
+#define GYRO_INT_Pin GPIO_PIN_11
+#define GYRO_INT_GPIO_Port GPIOB
+#define LED_RED_Pin GPIO_PIN_12
+#define LED_RED_GPIO_Port GPIOB
+#define LED_GREEN_Pin GPIO_PIN_13
+#define LED_GREEN_GPIO_Port GPIOB
+#define LED_BLUE_Pin GPIO_PIN_14
+#define LED_BLUE_GPIO_Port GPIOB
+#define SW1_Pin GPIO_PIN_10
+#define SW1_GPIO_Port GPIOC
+#define SW2_Pin GPIO_PIN_11
+#define SW2_GPIO_Port GPIOC
+#define SW3_Pin GPIO_PIN_12
+#define SW3_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
