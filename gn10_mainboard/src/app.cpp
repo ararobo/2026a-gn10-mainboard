@@ -4,6 +4,7 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
+#include "robomas_can/c620_can.hpp"
 
 namespace {
 
