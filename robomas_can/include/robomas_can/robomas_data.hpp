@@ -24,7 +24,7 @@ struct motor_type {
 } __attribute__((__packed__));
 
 // c610とc620に対応するための基底クラス
-class RobomasCAN
+class RobomasData
 {
 private:
     gn10_can::CANBus& bus_;
@@ -44,9 +44,9 @@ public:
      *
      * @param current_conversion 電流変換定数
      */
-    RobomasCAN(gn10_can::CANBus& bus);
+    RobomasData(gn10_can::CANBus& bus);
 
-    virtual ~RobomasCAN() = default;
+    virtual ~RobomasData() = default;
 
     /**
      * @brief MotorCurrent用のget関数
