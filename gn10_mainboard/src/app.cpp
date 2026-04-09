@@ -5,8 +5,8 @@
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_mainboard/three_wheel_omni.hpp"
-#include "wiznet_ether/robot_ethernet.hpp"
 #include "robomas_can/c620_can.hpp"
+#include "wiznet_ether/robot_ethernet.hpp"
 
 namespace {
 
@@ -55,6 +55,7 @@ void setup()
     wheel_config.set_max_duty_ratio(1.0f);
     wheel_front.set_init(wheel_config);
     wheel_back_l.set_init(wheel_config);
+    wheel_back_r.set_init(wheel_config);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
