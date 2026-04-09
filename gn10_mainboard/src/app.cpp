@@ -4,7 +4,7 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
-#include "gn10_mainboard/three_wheel_omni.hpp"
+#include "gn10_mainboard/four_wheel_omni.hpp"
 #include "robomas_can/c620_can.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
 
@@ -32,12 +32,13 @@ gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
 robomas_can::C620CAN wheel_esc(can1_driver);
 
 RobotEthernet ethernet;
-ThreeWheelOmni omni(0.2f, 0.06f);
+FourWheelOmni omni(0.2f, 0.06f);
 
 operation_data_t operation;
-float wheel_angular_velocity_front  = 0;
-float wheel_angular_velocity_back_l = 0;
-float wheel_angular_velocity_back_r = 0;
+float wheel_angular_velocity_fr = 0;
+float wheel_angular_velocity_fl = 0;
+float wheel_angular_velocity_bl = 0;
+float wheel_angular_velocity_br = 0;
 
 /**
  * @brief Initialize CAN and mainboard application state.
@@ -58,15 +59,15 @@ void loop()
     ethernet.receive_operation_data(&operation);
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
-        &wheel_angular_velocity_front,
-        &wheel_angular_velocity_back_l,
-        &wheel_angular_velocity_back_r
+        &wheel_angular_velocity_fr,
+        &wheel_angular_velocity_fl,
+        &wheel_angular_velocity_bl,
+        &wheel_angular_velocity_br
     );
+    float wheel_currents[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
     wheel_esc.set_current_can1(
-        wheel_angular_velocity_front,
-        wheel_angular_velocity_back_l,
-        wheel_angular_velocity_back_r,
-        0.0f
+        wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
     update_heartbeat_led();
@@ -80,6 +81,8 @@ extern "C" {
  */
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    can1_bus.update();
+    gn10_can::CANFrame rx_frame;
+    can1_driver.receive(rx_frame);
+    wheel_esc.receive_data(rx_frame.id, rx_frame.data.data());
 }
 }
