@@ -4,6 +4,7 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
+#include "gn10_mainboard/three_wheel_omni.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
 
 namespace {
@@ -28,16 +29,19 @@ void update_heartbeat_led()
 
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
 gn10_can::CANBus can1_bus(can1_driver);
-gn10_can::devices::MotorDriverClient motor1(can1_bus, 0);
-gn10_can::devices::MotorDriverClient motor2(can1_bus, 1);
+gn10_can::devices::MotorDriverClient wheel_front(can1_bus, 0);
+gn10_can::devices::MotorDriverClient wheel_back_l(can1_bus, 1);
+gn10_can::devices::MotorDriverClient wheel_back_r(can1_bus, 2);
 
-gn10_can::devices::MotorConfig motor1_config;
+gn10_can::devices::MotorConfig wheel_config;
 
 RobotEthernet ethernet;
+ThreeWheelOmni omni(0.2f, 0.06f);
 
-float output = 0.0f;
-float accel  = 0.001f;
-bool sign    = true;
+operation_data_t operation;
+float wheel_angular_velocity_front  = 0;
+float wheel_angular_velocity_back_l = 0;
+float wheel_angular_velocity_back_r = 0;
 
 /**
  * @brief Initialize CAN and mainboard application state.
@@ -46,10 +50,10 @@ void setup()
 {
     can1_driver.init();
     ethernet.init();
-    motor1_config.set_accel_ratio(1.0f);
-    motor1_config.set_max_duty_ratio(1.0f);
-    motor1.set_init(motor1_config);
-    motor2.set_init(motor1_config);
+    wheel_config.set_accel_ratio(1.0f);
+    wheel_config.set_max_duty_ratio(1.0f);
+    wheel_front.set_init(wheel_config);
+    wheel_back_l.set_init(wheel_config);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
@@ -59,21 +63,16 @@ void setup()
  */
 void loop()
 {
-    if (sign) {
-        output += accel;
-    } else {
-        output -= accel;
-    }
-
-    if (output > 1.0f) {
-        sign = false;
-    }
-    if (output < -1.0f) {
-        sign = true;
-    }
-
-    motor1.set_target(output);
-    motor2.set_target(output);
+    ethernet.receive_operation_data(&operation);
+    omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
+    omni.getWheelAngularVelocity(
+        &wheel_angular_velocity_front,
+        &wheel_angular_velocity_back_l,
+        &wheel_angular_velocity_back_r
+    );
+    wheel_front.set_target(wheel_angular_velocity_front);
+    wheel_back_l.set_target(wheel_angular_velocity_back_l);
+    wheel_back_r.set_target(wheel_angular_velocity_back_r);
     update_heartbeat_led();
     HAL_Delay(10);
 }
