@@ -854,8 +854,8 @@ __STATIC_INLINE void LL_SYSCFG_SetEXTISource(uint32_t Port, uint32_t Line)
  */
 __STATIC_INLINE uint32_t LL_SYSCFG_GetEXTISource(uint32_t Line)
 {
-    return (uint32_t)(READ_BIT(SYSCFG->EXTICR[Line & 0x3U], (Line >> 16U)) >>
-                      (POSITION_VAL(Line >> 16U) & 0x1FU));
+    return (uint32_t
+    )(READ_BIT(SYSCFG->EXTICR[Line & 0x3U], (Line >> 16U)) >> (POSITION_VAL(Line >> 16U) & 0x1FU));
 }
 
 /**
@@ -1038,8 +1038,8 @@ __STATIC_INLINE uint32_t LL_DBGMCU_GetDeviceID(void)
  */
 __STATIC_INLINE uint32_t LL_DBGMCU_GetRevisionID(void)
 {
-    return (uint32_t)(READ_BIT(DBGMCU->IDCODE, DBGMCU_IDCODE_REV_ID) >>
-                      (DBGMCU_REVID_POSITION & 0x1FU));
+    return (uint32_t
+    )(READ_BIT(DBGMCU->IDCODE, DBGMCU_IDCODE_REV_ID) >> (DBGMCU_REVID_POSITION & 0x1FU));
 }
 
 /**

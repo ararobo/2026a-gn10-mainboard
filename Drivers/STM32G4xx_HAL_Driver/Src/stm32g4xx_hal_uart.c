@@ -177,14 +177,14 @@
 /** @defgroup UART_Private_Constants UART Private Constants
  * @{
  */
-#define USART_CR1_FIELDS                                                                   \
-    ((uint32_t)(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS | USART_CR1_TE | USART_CR1_RE | \
-                USART_CR1_OVER8 | USART_CR1_FIFOEN)                                        \
-    ) /*!< UART or USART CR1 fields of parameters set by UART_SetConfig API */
+#define USART_CR1_FIELDS                                                                           \
+    ((uint32_t                                                                                     \
+    )(USART_CR1_M | USART_CR1_PCE | USART_CR1_PS | USART_CR1_TE | USART_CR1_RE | USART_CR1_OVER8 | \
+      USART_CR1_FIFOEN)) /*!< UART or USART CR1 fields of parameters set by UART_SetConfig API */
 
-#define USART_CR3_FIELDS                                                                 \
-    ((uint32_t)(USART_CR3_RTSE | USART_CR3_CTSE | USART_CR3_ONEBIT | USART_CR3_TXFTCFG | \
-                USART_CR3_RXFTCFG)                                                       \
+#define USART_CR3_FIELDS                                                                          \
+    ((uint32_t                                                                                    \
+    )(USART_CR3_RTSE | USART_CR3_CTSE | USART_CR3_ONEBIT | USART_CR3_TXFTCFG | USART_CR3_RXFTCFG) \
     ) /*!< UART or USART CR3 fields of parameters set by UART_SetConfig API */
 
 #define LPUART_BRR_MIN 0x00000300U /* LPUART BRR minimum authorized value */
@@ -2949,9 +2949,8 @@ HAL_StatusTypeDef UART_SetConfig(UART_HandleTypeDef *huart)
             } else {
                 /* Check computed UsartDiv value is in allocated range
                    (it is forbidden to write values lower than 0x300 in the LPUART_BRR register) */
-                usartdiv = (uint32_t)(UART_DIV_LPUART(
-                    pclk, huart->Init.BaudRate, huart->Init.ClockPrescaler
-                ));
+                usartdiv = (uint32_t
+                )(UART_DIV_LPUART(pclk, huart->Init.BaudRate, huart->Init.ClockPrescaler));
                 if ((usartdiv >= LPUART_BRR_MIN) && (usartdiv <= LPUART_BRR_MAX)) {
                     huart->Instance->BRR = usartdiv;
                 } else {
@@ -2959,7 +2958,7 @@ HAL_StatusTypeDef UART_SetConfig(UART_HandleTypeDef *huart)
                 }
             } /* if ( (lpuart_ker_ck_pres < (3 * huart->Init.BaudRate) ) ||
                       (lpuart_ker_ck_pres > (4096 * huart->Init.BaudRate) )) */
-        } /* if (pclk != 0) */
+        }     /* if (pclk != 0) */
     }
     /* Check UART Over Sampling to set Baud Rate Register */
     else if (huart->Init.OverSampling == UART_OVERSAMPLING_8) {
@@ -2987,9 +2986,8 @@ HAL_StatusTypeDef UART_SetConfig(UART_HandleTypeDef *huart)
 
         /* USARTDIV must be greater than or equal to 0d16 */
         if (pclk != 0U) {
-            usartdiv = (uint32_t)(UART_DIV_SAMPLING8(
-                pclk, huart->Init.BaudRate, huart->Init.ClockPrescaler
-            ));
+            usartdiv = (uint32_t
+            )(UART_DIV_SAMPLING8(pclk, huart->Init.BaudRate, huart->Init.ClockPrescaler));
             if ((usartdiv >= UART_BRR_MIN) && (usartdiv <= UART_BRR_MAX)) {
                 brrtemp = (uint16_t)(usartdiv & 0xFFF0U);
                 brrtemp |= (uint16_t)((usartdiv & (uint16_t)0x000FU) >> 1U);
@@ -3023,9 +3021,8 @@ HAL_StatusTypeDef UART_SetConfig(UART_HandleTypeDef *huart)
 
         if (pclk != 0U) {
             /* USARTDIV must be greater than or equal to 0d16 */
-            usartdiv = (uint32_t)(UART_DIV_SAMPLING16(
-                pclk, huart->Init.BaudRate, huart->Init.ClockPrescaler
-            ));
+            usartdiv = (uint32_t
+            )(UART_DIV_SAMPLING16(pclk, huart->Init.BaudRate, huart->Init.ClockPrescaler));
             if ((usartdiv >= UART_BRR_MIN) && (usartdiv <= UART_BRR_MAX)) {
                 huart->Instance->BRR = (uint16_t)usartdiv;
             } else {

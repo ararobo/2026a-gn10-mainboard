@@ -496,8 +496,9 @@ typedef struct {
     ((CSR_REG_INDEX << 5U) | RCC_CSR_IWDGRSTF_Pos) /*!< Independent Watchdog reset flag */
 #define RCC_FLAG_WWDGRST \
     ((CSR_REG_INDEX << 5U) | RCC_CSR_WWDGRSTF_Pos) /*!< Window watchdog reset flag */
-#define RCC_FLAG_LPWRRST ((CSR_REG_INDEX << 5U) | RCC_CSR_LPWRRSTF_Pos) /*!< Low-Power reset flag \
-                                                                         */
+#define RCC_FLAG_LPWRRST                                                     \
+    ((CSR_REG_INDEX << 5U) | RCC_CSR_LPWRRSTF_Pos) /*!< Low-Power reset flag \
+                                                    */
 
 /* Flags in the CRRCR register */
 #define RCC_FLAG_HSI48RDY \
@@ -3439,9 +3440,9 @@ typedef struct {
 #define RCC_FLAG_MASK 0x1FU
 
 /* Define used for IS_RCC_CLOCKTYPE() */
-#define RCC_CLOCKTYPE_ALL                                                                  \
-    (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 \
-    ) /*!< All clcoktype to configure */
+#define RCC_CLOCKTYPE_ALL                                              \
+    (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | \
+     RCC_CLOCKTYPE_PCLK2) /*!< All clcoktype to configure */
 
 /**
  * @}
@@ -3551,9 +3552,9 @@ typedef struct {
 
 /* Initialization and de-initialization functions  ******************************/
 HAL_StatusTypeDef HAL_RCC_DeInit(void);
-HAL_StatusTypeDef HAL_RCC_OscConfig(const RCC_OscInitTypeDef *RCC_OscInitStruct);
+HAL_StatusTypeDef HAL_RCC_OscConfig(const RCC_OscInitTypeDef* RCC_OscInitStruct);
 HAL_StatusTypeDef HAL_RCC_ClockConfig(
-    const RCC_ClkInitTypeDef *RCC_ClkInitStruct, uint32_t FLatency
+    const RCC_ClkInitTypeDef* RCC_ClkInitStruct, uint32_t FLatency
 );
 
 /**
@@ -3573,8 +3574,8 @@ uint32_t HAL_RCC_GetSysClockFreq(void);
 uint32_t HAL_RCC_GetHCLKFreq(void);
 uint32_t HAL_RCC_GetPCLK1Freq(void);
 uint32_t HAL_RCC_GetPCLK2Freq(void);
-void HAL_RCC_GetOscConfig(RCC_OscInitTypeDef *RCC_OscInitStruct);
-void HAL_RCC_GetClockConfig(RCC_ClkInitTypeDef *RCC_ClkInitStruct, uint32_t *pFLatency);
+void HAL_RCC_GetOscConfig(RCC_OscInitTypeDef* RCC_OscInitStruct);
+void HAL_RCC_GetClockConfig(RCC_ClkInitTypeDef* RCC_ClkInitStruct, uint32_t* pFLatency);
 /* CSS NMI IRQ handler */
 void HAL_RCC_NMI_IRQHandler(void);
 /* User Callbacks in non blocking mode (IT mode) */

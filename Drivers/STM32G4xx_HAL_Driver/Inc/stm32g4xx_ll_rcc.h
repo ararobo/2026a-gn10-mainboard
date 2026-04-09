@@ -1063,7 +1063,7 @@ typedef struct {
  */
 #define __LL_RCC_CALC_HCLK_FREQ(__SYSCLKFREQ__, __AHBPRESCALER__) \
     ((__SYSCLKFREQ__) >>                                          \
-     (AHBPrescTable[((__AHBPRESCALER__) & RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos] & 0x1FU))
+     (AHBPrescTable[((__AHBPRESCALER__)&RCC_CFGR_HPRE) >> RCC_CFGR_HPRE_Pos] & 0x1FU))
 
 /**
  * @brief  Helper macro to calculate the PCLK1 frequency (ABP1)
@@ -2024,9 +2024,9 @@ __STATIC_INLINE uint32_t LL_RCC_GetLPUARTClockSource(uint32_t LPUARTx)
 __STATIC_INLINE uint32_t LL_RCC_GetI2CClockSource(uint32_t I2Cx)
 {
     __IO const uint32_t *reg = (__IO uint32_t *)(uint32_t)(RCC_BASE + 0x88U + (I2Cx >> 24U));
-    return (uint32_t)((READ_BIT(*reg, 3UL << ((I2Cx & 0x001F0000U) >> 16U)) >>
-                       ((I2Cx & 0x001F0000U) >> 16U)) |
-                      (I2Cx & 0xFFFF0000U));
+    return (uint32_t
+    )((READ_BIT(*reg, 3UL << ((I2Cx & 0x001F0000U) >> 16U)) >> ((I2Cx & 0x001F0000U) >> 16U)) |
+      (I2Cx & 0xFFFF0000U));
 }
 
 /**
@@ -2145,9 +2145,10 @@ __STATIC_INLINE uint32_t LL_RCC_GetUSBClockSource(uint32_t USBx)
  */
 __STATIC_INLINE uint32_t LL_RCC_GetADCClockSource(uint32_t ADCx)
 {
-    return (uint32_t)((READ_BIT(RCC->CCIPR, 3UL << ((ADCx & 0x001F0000U) >> 16U)) >>
-                       ((ADCx & 0x001F0000U) >> 16U)) |
-                      (ADCx & 0xFFFF0000U));
+    return (uint32_t
+    )((READ_BIT(RCC->CCIPR, 3UL << ((ADCx & 0x001F0000U) >> 16U)) >> ((ADCx & 0x001F0000U) >> 16U)
+      ) |
+      (ADCx & 0xFFFF0000U));
 }
 
 #if defined(QUADSPI)
@@ -2545,11 +2546,11 @@ __STATIC_INLINE uint32_t LL_RCC_PLL_GetN(void)
  */
 __STATIC_INLINE uint32_t LL_RCC_PLL_GetP(void)
 {
-    return (uint32_t)((READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLPDIV) != 0U)
-                          ? READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLPDIV)
-                          : ((READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLP) == RCC_PLLCFGR_PLLP)
-                                 ? LL_RCC_PLLP_DIV_17
-                                 : LL_RCC_PLLP_DIV_7));
+    return (uint32_t
+    )((READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLPDIV) != 0U)
+          ? READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLPDIV)
+          : ((READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLP) == RCC_PLLCFGR_PLLP) ? LL_RCC_PLLP_DIV_17
+                                                                            : LL_RCC_PLLP_DIV_7));
 }
 
 /**

@@ -45,8 +45,22 @@ extern "C" {
 /* Array used to get the USART prescaler division decimal values versus @ref USART_LL_EC_PRESCALER
  * values */
 static const uint32_t USART_PRESCALER_TAB[] = {
-    1UL, 2UL, 4UL, 6UL, 8UL, 10UL, 12UL, 16UL, 32UL, 64UL, 128UL, 256UL, 256UL, 256UL, 256UL, 256UL
-};
+    1UL,
+    2UL,
+    4UL,
+    6UL,
+    8UL,
+    10UL,
+    12UL,
+    16UL,
+    32UL,
+    64UL,
+    128UL,
+    256UL,
+    256UL,
+    256UL,
+    256UL,
+    256UL};
 /**
  * @}
  */

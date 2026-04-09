@@ -486,8 +486,8 @@ __STATIC_INLINE uint32_t LL_CPUID_GetVariant(void)
  */
 __STATIC_INLINE uint32_t LL_CPUID_GetArchitecture(void)
 {
-    return (uint32_t)(READ_BIT(SCB->CPUID, SCB_CPUID_ARCHITECTURE_Msk) >> SCB_CPUID_ARCHITECTURE_Pos
-    );
+    return (uint32_t
+    )(READ_BIT(SCB->CPUID, SCB_CPUID_ARCHITECTURE_Msk) >> SCB_CPUID_ARCHITECTURE_Pos);
 }
 
 /**

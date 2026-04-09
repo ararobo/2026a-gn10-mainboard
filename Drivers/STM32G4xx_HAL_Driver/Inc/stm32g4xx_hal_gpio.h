@@ -117,25 +117,25 @@ typedef enum { GPIO_PIN_RESET = 0U, GPIO_PIN_SET } GPIO_PinState;
 
 #define GPIO_MODE_ANALOG MODE_ANALOG /*!< Analog Mode  */
 
-#define GPIO_MODE_IT_RISING                \
-    (MODE_INPUT | EXTI_IT | TRIGGER_RISING \
-    ) /*!< External Interrupt Mode with Rising edge trigger detection          */
-#define GPIO_MODE_IT_FALLING                \
-    (MODE_INPUT | EXTI_IT | TRIGGER_FALLING \
-    ) /*!< External Interrupt Mode with Falling edge trigger detection         */
-#define GPIO_MODE_IT_RISING_FALLING                          \
-    (MODE_INPUT | EXTI_IT | TRIGGER_RISING | TRIGGER_FALLING \
-    ) /*!< External Interrupt Mode with Rising/Falling edge trigger detection  */
+#define GPIO_MODE_IT_RISING \
+    (MODE_INPUT | EXTI_IT | \
+     TRIGGER_RISING) /*!< External Interrupt Mode with Rising edge trigger detection          */
+#define GPIO_MODE_IT_FALLING \
+    (MODE_INPUT | EXTI_IT |  \
+     TRIGGER_FALLING) /*!< External Interrupt Mode with Falling edge trigger detection         */
+#define GPIO_MODE_IT_RISING_FALLING          \
+    (MODE_INPUT | EXTI_IT | TRIGGER_RISING | \
+     TRIGGER_FALLING) /*!< External Interrupt Mode with Rising/Falling edge trigger detection  */
 
-#define GPIO_MODE_EVT_RISING                \
-    (MODE_INPUT | EXTI_EVT | TRIGGER_RISING \
-    ) /*!< External Event Mode with Rising edge trigger detection             */
-#define GPIO_MODE_EVT_FALLING                \
-    (MODE_INPUT | EXTI_EVT | TRIGGER_FALLING \
-    ) /*!< External Event Mode with Falling edge trigger detection            */
-#define GPIO_MODE_EVT_RISING_FALLING                          \
-    (MODE_INPUT | EXTI_EVT | TRIGGER_RISING | TRIGGER_FALLING \
-    ) /*!< External Event Mode with Rising/Falling edge trigger detection     */
+#define GPIO_MODE_EVT_RISING \
+    (MODE_INPUT | EXTI_EVT | \
+     TRIGGER_RISING) /*!< External Event Mode with Rising edge trigger detection             */
+#define GPIO_MODE_EVT_FALLING \
+    (MODE_INPUT | EXTI_EVT |  \
+     TRIGGER_FALLING) /*!< External Event Mode with Falling edge trigger detection            */
+#define GPIO_MODE_EVT_RISING_FALLING          \
+    (MODE_INPUT | EXTI_EVT | TRIGGER_RISING | \
+     TRIGGER_FALLING) /*!< External Event Mode with Rising/Falling edge trigger detection     */
 /**
  * @}
  */
@@ -288,8 +288,8 @@ typedef enum { GPIO_PIN_RESET = 0U, GPIO_PIN_SET } GPIO_PinState;
  */
 
 /* Initialization and de-initialization functions *****************************/
-void HAL_GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef const *GPIO_Init);
-void HAL_GPIO_DeInit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
+void HAL_GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef const* GPIO_Init);
+void HAL_GPIO_DeInit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin);
 
 /**
  * @}
@@ -301,10 +301,10 @@ void HAL_GPIO_DeInit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin);
  */
 
 /* IO operation functions *****************************************************/
-GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef const *GPIOx, uint16_t GPIO_Pin);
-void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
-void HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
-HAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
+GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef const* GPIOx, uint16_t GPIO_Pin);
+void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);
+void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+HAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 

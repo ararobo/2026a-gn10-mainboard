@@ -2180,10 +2180,10 @@ __STATIC_INLINE void LL_I2C_HandleTransfer(
 {
     /* Declaration of tmp to prevent undefined behavior of volatile usage */
     uint32_t tmp =
-        ((uint32_t)(((uint32_t)SlaveAddr & I2C_CR2_SADD) |
-                    ((uint32_t)SlaveAddrSize & I2C_CR2_ADD10) |
-                    (((uint32_t)TransferSize << I2C_CR2_NBYTES_Pos) & I2C_CR2_NBYTES) |
-                    (uint32_t)EndMode | (uint32_t)Request) &
+        ((uint32_t
+         )(((uint32_t)SlaveAddr & I2C_CR2_SADD) | ((uint32_t)SlaveAddrSize & I2C_CR2_ADD10) |
+           (((uint32_t)TransferSize << I2C_CR2_NBYTES_Pos) & I2C_CR2_NBYTES) | (uint32_t)EndMode |
+           (uint32_t)Request) &
          (~0x80000000U));
 
     /* update CR2 register */

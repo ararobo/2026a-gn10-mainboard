@@ -1654,8 +1654,9 @@ extern "C" {
 #define ETH_MAC_SMALL_FIFO_WRITE_ACTIVE 0x00000004U /* MAC small FIFO write controller active */
 #define ETH_MAC_SMALL_FIFO_RW_ACTIVE \
     0x00000006U /* MAC small FIFO read / write controllers active */
-#define ETH_MAC_MII_RECEIVE_PROTOCOL_ACTIVE 0x00000001U /* MAC MII receive protocol engine active \
-                                                         */
+#define ETH_MAC_MII_RECEIVE_PROTOCOL_ACTIVE               \
+    0x00000001U /* MAC MII receive protocol engine active \
+                 */
 
 #define ETH_TxPacketConfig \
     ETH_TxPacketConfigTypeDef /* Transmit Packet Configuration structure definition */

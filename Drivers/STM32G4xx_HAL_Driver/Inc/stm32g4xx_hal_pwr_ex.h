@@ -65,8 +65,9 @@ typedef struct {
  * PWR_WAKEUP_PINy_xxx constants
  * @{
  */
-#define PWR_WUP_POLARITY_SHIFT 0x05U /*!< Internal constant used to retrieve wakeup pin polariry \
-                                      */
+#define PWR_WUP_POLARITY_SHIFT                                        \
+    0x05U /*!< Internal constant used to retrieve wakeup pin polariry \
+           */
 /**
  * @}
  */
@@ -84,26 +85,21 @@ typedef struct {
 #define PWR_WAKEUP_PIN3_HIGH PWR_CR3_EWUP3 /*!< Wakeup pin 3 (with high level polarity) */
 #define PWR_WAKEUP_PIN4_HIGH PWR_CR3_EWUP4 /*!< Wakeup pin 4 (with high level polarity) */
 #define PWR_WAKEUP_PIN5_HIGH PWR_CR3_EWUP5 /*!< Wakeup pin 5 (with high level polarity) */
-#define PWR_WAKEUP_PIN1_LOW                                     \
-    (uint32_t)(                                                 \
-        (PWR_CR4_WP1 << PWR_WUP_POLARITY_SHIFT) | PWR_CR3_EWUP1 \
-    ) /*!< Wakeup pin 1 (with low level polarity) */
-#define PWR_WAKEUP_PIN2_LOW                                     \
-    (uint32_t)(                                                 \
-        (PWR_CR4_WP2 << PWR_WUP_POLARITY_SHIFT) | PWR_CR3_EWUP2 \
-    ) /*!< Wakeup pin 2 (with low level polarity) */
-#define PWR_WAKEUP_PIN3_LOW                                     \
-    (uint32_t)(                                                 \
-        (PWR_CR4_WP3 << PWR_WUP_POLARITY_SHIFT) | PWR_CR3_EWUP3 \
-    ) /*!< Wakeup pin 3 (with low level polarity) */
-#define PWR_WAKEUP_PIN4_LOW                                     \
-    (uint32_t)(                                                 \
-        (PWR_CR4_WP4 << PWR_WUP_POLARITY_SHIFT) | PWR_CR3_EWUP4 \
-    ) /*!< Wakeup pin 4 (with low level polarity) */
-#define PWR_WAKEUP_PIN5_LOW                                     \
-    (uint32_t)(                                                 \
-        (PWR_CR4_WP5 << PWR_WUP_POLARITY_SHIFT) | PWR_CR3_EWUP5 \
-    ) /*!< Wakeup pin 5 (with low level polarity) */
+#define PWR_WAKEUP_PIN1_LOW                              \
+    (uint32_t)((PWR_CR4_WP1 << PWR_WUP_POLARITY_SHIFT) | \
+               PWR_CR3_EWUP1) /*!< Wakeup pin 1 (with low level polarity) */
+#define PWR_WAKEUP_PIN2_LOW                              \
+    (uint32_t)((PWR_CR4_WP2 << PWR_WUP_POLARITY_SHIFT) | \
+               PWR_CR3_EWUP2) /*!< Wakeup pin 2 (with low level polarity) */
+#define PWR_WAKEUP_PIN3_LOW                              \
+    (uint32_t)((PWR_CR4_WP3 << PWR_WUP_POLARITY_SHIFT) | \
+               PWR_CR3_EWUP3) /*!< Wakeup pin 3 (with low level polarity) */
+#define PWR_WAKEUP_PIN4_LOW                              \
+    (uint32_t)((PWR_CR4_WP4 << PWR_WUP_POLARITY_SHIFT) | \
+               PWR_CR3_EWUP4) /*!< Wakeup pin 4 (with low level polarity) */
+#define PWR_WAKEUP_PIN5_LOW                              \
+    (uint32_t)((PWR_CR4_WP5 << PWR_WUP_POLARITY_SHIFT) | \
+               PWR_CR3_EWUP5) /*!< Wakeup pin 5 (with low level polarity) */
 /**
  * @}
  */
@@ -137,8 +133,9 @@ typedef struct {
     0x00010002U /*!< External Interrupt Mode with Falling edge trigger detection */
 #define PWR_PVM_MODE_IT_RISING_FALLING \
     0x00010003U /*!< External Interrupt Mode with Rising/Falling edge trigger detection */
-#define PWR_PVM_MODE_EVENT_RISING 0x00020001U /*!< Event Mode with Rising edge trigger detection \
-                                               */
+#define PWR_PVM_MODE_EVENT_RISING                                  \
+    0x00020001U /*!< Event Mode with Rising edge trigger detection \
+                 */
 #define PWR_PVM_MODE_EVENT_FALLING \
     0x00020002U /*!< Event Mode with Falling edge trigger detection */
 #define PWR_PVM_MODE_EVENT_RISING_FALLING \
@@ -762,7 +759,7 @@ void HAL_PWREx_EnablePVM3(void);
 void HAL_PWREx_DisablePVM3(void);
 void HAL_PWREx_EnablePVM4(void);
 void HAL_PWREx_DisablePVM4(void);
-HAL_StatusTypeDef HAL_PWREx_ConfigPVM(PWR_PVMTypeDef const *sConfigPVM);
+HAL_StatusTypeDef HAL_PWREx_ConfigPVM(PWR_PVMTypeDef const* sConfigPVM);
 
 /* Low Power modes configuration functions ************************************/
 void HAL_PWREx_EnableLowPowerRunMode(void);

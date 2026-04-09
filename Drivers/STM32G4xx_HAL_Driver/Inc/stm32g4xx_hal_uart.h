@@ -289,9 +289,8 @@ typedef struct __UART_HandleTypeDef {
     ); /*!< UART Rx Fifo Full Callback            */
     void (*TxFifoEmptyCallback)(struct __UART_HandleTypeDef *huart
     ); /*!< UART Tx Fifo Empty Callback           */
-    void (*RxEventCallback)(
-        struct __UART_HandleTypeDef *huart, uint16_t Pos
-    ); /*!< UART Reception Event Callback     */
+    void (*RxEventCallback
+    )(struct __UART_HandleTypeDef *huart, uint16_t Pos); /*!< UART Reception Event Callback     */
 
     void (*MspInitCallback)(struct __UART_HandleTypeDef *huart);   /*!< UART Msp Init callback   */
     void (*MspDeInitCallback)(struct __UART_HandleTypeDef *huart); /*!< UART Msp DeInit callback */
@@ -326,9 +325,9 @@ typedef enum {
  */
 typedef void (*pUART_CallbackTypeDef)(UART_HandleTypeDef *huart
 ); /*!< pointer to an UART callback function */
-typedef void (*pUART_RxEventCallbackTypeDef)(
-    struct __UART_HandleTypeDef *huart, uint16_t Pos
-); /*!< pointer to a UART Rx Event specific callback function */
+typedef void (*pUART_RxEventCallbackTypeDef
+)(struct __UART_HandleTypeDef *huart,
+  uint16_t Pos); /*!< pointer to a UART Rx Event specific callback function */
 
 #endif /* USE_HAL_UART_REGISTER_CALLBACKS */
 
@@ -1030,12 +1029,12 @@ typedef void (*pUART_RxEventCallbackTypeDef)(
  *            @arg @ref UART_IT_ERR   Error interrupt (frame error, noise error, overrun error)
  * @retval None
  */
-#define __HAL_UART_ENABLE_IT(__HANDLE__, __INTERRUPT__)                              \
-    (((((uint8_t)(__INTERRUPT__)) >> 5U) == 1U)                                      \
-         ? ((__HANDLE__)->Instance->CR1 |= (1U << ((__INTERRUPT__) & UART_IT_MASK))) \
-     : ((((uint8_t)(__INTERRUPT__)) >> 5U) == 2U)                                    \
-         ? ((__HANDLE__)->Instance->CR2 |= (1U << ((__INTERRUPT__) & UART_IT_MASK))) \
-         : ((__HANDLE__)->Instance->CR3 |= (1U << ((__INTERRUPT__) & UART_IT_MASK))))
+#define __HAL_UART_ENABLE_IT(__HANDLE__, __INTERRUPT__)                            \
+    (((((uint8_t)(__INTERRUPT__)) >> 5U) == 1U)                                    \
+         ? ((__HANDLE__)->Instance->CR1 |= (1U << ((__INTERRUPT__)&UART_IT_MASK))) \
+     : ((((uint8_t)(__INTERRUPT__)) >> 5U) == 2U)                                  \
+         ? ((__HANDLE__)->Instance->CR2 |= (1U << ((__INTERRUPT__)&UART_IT_MASK))) \
+         : ((__HANDLE__)->Instance->CR3 |= (1U << ((__INTERRUPT__)&UART_IT_MASK))))
 
 /** @brief  Disable the specified UART interrupt.
  * @param  __HANDLE__ specifies the UART Handle.
@@ -1060,12 +1059,12 @@ typedef void (*pUART_RxEventCallbackTypeDef)(
  *            @arg @ref UART_IT_ERR   Error interrupt (Frame error, noise error, overrun error)
  * @retval None
  */
-#define __HAL_UART_DISABLE_IT(__HANDLE__, __INTERRUPT__)                              \
-    (((((uint8_t)(__INTERRUPT__)) >> 5U) == 1U)                                       \
-         ? ((__HANDLE__)->Instance->CR1 &= ~(1U << ((__INTERRUPT__) & UART_IT_MASK))) \
-     : ((((uint8_t)(__INTERRUPT__)) >> 5U) == 2U)                                     \
-         ? ((__HANDLE__)->Instance->CR2 &= ~(1U << ((__INTERRUPT__) & UART_IT_MASK))) \
-         : ((__HANDLE__)->Instance->CR3 &= ~(1U << ((__INTERRUPT__) & UART_IT_MASK))))
+#define __HAL_UART_DISABLE_IT(__HANDLE__, __INTERRUPT__)                            \
+    (((((uint8_t)(__INTERRUPT__)) >> 5U) == 1U)                                     \
+         ? ((__HANDLE__)->Instance->CR1 &= ~(1U << ((__INTERRUPT__)&UART_IT_MASK))) \
+     : ((((uint8_t)(__INTERRUPT__)) >> 5U) == 2U)                                   \
+         ? ((__HANDLE__)->Instance->CR2 &= ~(1U << ((__INTERRUPT__)&UART_IT_MASK))) \
+         : ((__HANDLE__)->Instance->CR3 &= ~(1U << ((__INTERRUPT__)&UART_IT_MASK))))
 
 /** @brief  Check whether the specified UART interrupt has occurred or not.
  * @param  __HANDLE__ specifies the UART Handle.
@@ -1302,10 +1301,11 @@ typedef void (*pUART_RxEventCallbackTypeDef)(
  * @param  __CLOCKPRESCALER__ UART prescaler value.
  * @retval Division result
  */
-#define UART_DIV_LPUART(__PCLK__, __BAUD__, __CLOCKPRESCALER__)                               \
-    ((uint32_t)((((((uint64_t)(__PCLK__)) / (UARTPrescTable[(__CLOCKPRESCALER__)])) * 256U) + \
-                 (uint32_t)((__BAUD__) / 2U)) /                                               \
-                (__BAUD__)))
+#define UART_DIV_LPUART(__PCLK__, __BAUD__, __CLOCKPRESCALER__)                     \
+    ((uint32_t                                                                      \
+    )((((((uint64_t)(__PCLK__)) / (UARTPrescTable[(__CLOCKPRESCALER__)])) * 256U) + \
+       (uint32_t)((__BAUD__) / 2U)) /                                               \
+      (__BAUD__)))
 
 /** @brief  BRR division operation to set BRR register in 8-bit oversampling mode.
  * @param  __PCLK__ UART clock.

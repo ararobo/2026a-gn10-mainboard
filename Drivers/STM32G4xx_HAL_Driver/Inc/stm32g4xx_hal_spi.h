@@ -112,17 +112,17 @@ typedef enum {
  * @brief  SPI handle Structure definition
  */
 typedef struct __SPI_HandleTypeDef {
-    SPI_TypeDef *Instance; /*!< SPI registers base address               */
+    SPI_TypeDef* Instance; /*!< SPI registers base address               */
 
     SPI_InitTypeDef Init; /*!< SPI communication parameters             */
 
-    const uint8_t *pTxBuffPtr; /*!< Pointer to SPI Tx transfer Buffer        */
+    const uint8_t* pTxBuffPtr; /*!< Pointer to SPI Tx transfer Buffer        */
 
     uint16_t TxXferSize; /*!< SPI Tx Transfer size                     */
 
     __IO uint16_t TxXferCount; /*!< SPI Tx Transfer Counter                  */
 
-    uint8_t *pRxBuffPtr; /*!< Pointer to SPI Rx transfer Buffer        */
+    uint8_t* pRxBuffPtr; /*!< Pointer to SPI Rx transfer Buffer        */
 
     uint16_t RxXferSize; /*!< SPI Rx Transfer size                     */
 
@@ -130,13 +130,13 @@ typedef struct __SPI_HandleTypeDef {
 
     uint32_t CRCSize; /*!< SPI CRC size used for the transfer       */
 
-    void (*RxISR)(struct __SPI_HandleTypeDef *hspi); /*!< function pointer on Rx ISR       */
+    void (*RxISR)(struct __SPI_HandleTypeDef* hspi); /*!< function pointer on Rx ISR       */
 
-    void (*TxISR)(struct __SPI_HandleTypeDef *hspi); /*!< function pointer on Tx ISR       */
+    void (*TxISR)(struct __SPI_HandleTypeDef* hspi); /*!< function pointer on Tx ISR       */
 
-    DMA_HandleTypeDef *hdmatx; /*!< SPI Tx DMA Handle parameters             */
+    DMA_HandleTypeDef* hdmatx; /*!< SPI Tx DMA Handle parameters             */
 
-    DMA_HandleTypeDef *hdmarx; /*!< SPI Rx DMA Handle parameters             */
+    DMA_HandleTypeDef* hdmarx; /*!< SPI Rx DMA Handle parameters             */
 
     HAL_LockTypeDef Lock; /*!< Locking object                           */
 
@@ -145,19 +145,22 @@ typedef struct __SPI_HandleTypeDef {
     __IO uint32_t ErrorCode; /*!< SPI Error code                           */
 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
-    void (*TxCpltCallback)(struct __SPI_HandleTypeDef *hspi);   /*!< SPI Tx Completed callback   */
-    void (*RxCpltCallback)(struct __SPI_HandleTypeDef *hspi);   /*!< SPI Rx Completed callback   */
-    void (*TxRxCpltCallback)(struct __SPI_HandleTypeDef *hspi); /*!< SPI TxRx Completed callback */
-    void (*TxHalfCpltCallback)(struct __SPI_HandleTypeDef *hspi
+    void (*TxCpltCallback)(struct __SPI_HandleTypeDef* hspi);   /*!< SPI Tx Completed callback   */
+    void (*RxCpltCallback)(struct __SPI_HandleTypeDef* hspi);   /*!< SPI Rx Completed callback   */
+    void (*TxRxCpltCallback)(struct __SPI_HandleTypeDef* hspi); /*!< SPI TxRx Completed callback */
+    void (*TxHalfCpltCallback)(
+        struct __SPI_HandleTypeDef* hspi
     ); /*!< SPI Tx Half Completed callback     */
-    void (*RxHalfCpltCallback)(struct __SPI_HandleTypeDef *hspi
+    void (*RxHalfCpltCallback)(
+        struct __SPI_HandleTypeDef* hspi
     ); /*!< SPI Rx Half Completed callback     */
-    void (*TxRxHalfCpltCallback)(struct __SPI_HandleTypeDef *hspi
+    void (*TxRxHalfCpltCallback)(
+        struct __SPI_HandleTypeDef* hspi
     ); /*!< SPI TxRx Half Completed callback   */
-    void (*ErrorCallback)(struct __SPI_HandleTypeDef *hspi);     /*!< SPI Error callback     */
-    void (*AbortCpltCallback)(struct __SPI_HandleTypeDef *hspi); /*!< SPI Abort callback */
-    void (*MspInitCallback)(struct __SPI_HandleTypeDef *hspi);   /*!< SPI Msp Init callback   */
-    void (*MspDeInitCallback)(struct __SPI_HandleTypeDef *hspi); /*!< SPI Msp DeInit callback */
+    void (*ErrorCallback)(struct __SPI_HandleTypeDef* hspi);     /*!< SPI Error callback     */
+    void (*AbortCpltCallback)(struct __SPI_HandleTypeDef* hspi); /*!< SPI Abort callback */
+    void (*MspInitCallback)(struct __SPI_HandleTypeDef* hspi);   /*!< SPI Msp Init callback   */
+    void (*MspDeInitCallback)(struct __SPI_HandleTypeDef* hspi); /*!< SPI Msp DeInit callback */
 
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
 } SPI_HandleTypeDef;
@@ -183,7 +186,8 @@ typedef enum {
 /**
  * @brief  HAL SPI Callback pointer definition
  */
-typedef void (*pSPI_CallbackTypeDef)(SPI_HandleTypeDef *hspi
+typedef void (*pSPI_CallbackTypeDef)(
+    SPI_HandleTypeDef* hspi
 ); /*!< pointer to an SPI callback function */
 
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
@@ -775,18 +779,18 @@ typedef void (*pSPI_CallbackTypeDef)(SPI_HandleTypeDef *hspi
  * @{
  */
 /* Initialization/de-initialization functions  ********************************/
-HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi);
-HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef *hspi);
-void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi);
-void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi);
+HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef* hspi);
+HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef* hspi);
+void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi);
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi);
 
 /* Callbacks Register/UnRegister functions  ***********************************/
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
 HAL_StatusTypeDef HAL_SPI_RegisterCallback(
-    SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID, pSPI_CallbackTypeDef pCallback
+    SPI_HandleTypeDef* hspi, HAL_SPI_CallbackIDTypeDef CallbackID, pSPI_CallbackTypeDef pCallback
 );
 HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(
-    SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID
+    SPI_HandleTypeDef* hspi, HAL_SPI_CallbackIDTypeDef CallbackID
 );
 #endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
 /**
@@ -798,46 +802,46 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(
  */
 /* I/O operation functions  ***************************************************/
 HAL_StatusTypeDef HAL_SPI_Transmit(
-    SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size, uint32_t Timeout
+    SPI_HandleTypeDef* hspi, const uint8_t* pData, uint16_t Size, uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_SPI_Receive(
-    SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout
+    SPI_HandleTypeDef* hspi, uint8_t* pData, uint16_t Size, uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_SPI_TransmitReceive(
-    SPI_HandleTypeDef *hspi,
-    const uint8_t *pTxData,
-    uint8_t *pRxData,
+    SPI_HandleTypeDef* hspi,
+    const uint8_t* pTxData,
+    uint8_t* pRxData,
     uint16_t Size,
     uint32_t Timeout
 );
-HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size);
-HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef* hspi, const uint8_t* pData, uint16_t Size);
+HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef* hspi, uint8_t* pData, uint16_t Size);
 HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(
-    SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uint8_t *pRxData, uint16_t Size
+    SPI_HandleTypeDef* hspi, const uint8_t* pTxData, uint8_t* pRxData, uint16_t Size
 );
 HAL_StatusTypeDef HAL_SPI_Transmit_DMA(
-    SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size
+    SPI_HandleTypeDef* hspi, const uint8_t* pData, uint16_t Size
 );
-HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef* hspi, uint8_t* pData, uint16_t Size);
 HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(
-    SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uint8_t *pRxData, uint16_t Size
+    SPI_HandleTypeDef* hspi, const uint8_t* pTxData, uint8_t* pRxData, uint16_t Size
 );
-HAL_StatusTypeDef HAL_SPI_DMAPause(SPI_HandleTypeDef *hspi);
-HAL_StatusTypeDef HAL_SPI_DMAResume(SPI_HandleTypeDef *hspi);
-HAL_StatusTypeDef HAL_SPI_DMAStop(SPI_HandleTypeDef *hspi);
+HAL_StatusTypeDef HAL_SPI_DMAPause(SPI_HandleTypeDef* hspi);
+HAL_StatusTypeDef HAL_SPI_DMAResume(SPI_HandleTypeDef* hspi);
+HAL_StatusTypeDef HAL_SPI_DMAStop(SPI_HandleTypeDef* hspi);
 /* Transfer Abort functions */
-HAL_StatusTypeDef HAL_SPI_Abort(SPI_HandleTypeDef *hspi);
-HAL_StatusTypeDef HAL_SPI_Abort_IT(SPI_HandleTypeDef *hspi);
+HAL_StatusTypeDef HAL_SPI_Abort(SPI_HandleTypeDef* hspi);
+HAL_StatusTypeDef HAL_SPI_Abort_IT(SPI_HandleTypeDef* hspi);
 
-void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi);
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi);
-void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi);
+void HAL_SPI_IRQHandler(SPI_HandleTypeDef* hspi);
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef* hspi);
+void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef* hspi);
 /**
  * @}
  */
@@ -846,8 +850,8 @@ void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi);
  * @{
  */
 /* Peripheral State and Error functions ***************************************/
-HAL_SPI_StateTypeDef HAL_SPI_GetState(const SPI_HandleTypeDef *hspi);
-uint32_t HAL_SPI_GetError(const SPI_HandleTypeDef *hspi);
+HAL_SPI_StateTypeDef HAL_SPI_GetState(const SPI_HandleTypeDef* hspi);
+uint32_t HAL_SPI_GetError(const SPI_HandleTypeDef* hspi);
 /**
  * @}
  */

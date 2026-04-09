@@ -1267,8 +1267,9 @@ HAL_StatusTypeDef HAL_FDCAN_ConfigFilter(
                  (sFilterConfig->FilterID1 << 16U) | sFilterConfig->FilterID2);
 
             /* Calculate filter address */
-            FilterAddress = (uint32_t *)(hfdcan->msgRam.StandardFilterSA +
-                                         (sFilterConfig->FilterIndex * SRAMCAN_FLS_SIZE));
+            FilterAddress =
+                (uint32_t
+                     *)(hfdcan->msgRam.StandardFilterSA + (sFilterConfig->FilterIndex * SRAMCAN_FLS_SIZE));
 
             /* Write filter element to the message RAM */
             *FilterAddress = FilterElementW1;
@@ -1289,8 +1290,9 @@ HAL_StatusTypeDef HAL_FDCAN_ConfigFilter(
             FilterElementW2 = ((sFilterConfig->FilterType << 30U) | sFilterConfig->FilterID2);
 
             /* Calculate filter address */
-            FilterAddress = (uint32_t *)(hfdcan->msgRam.ExtendedFilterSA +
-                                         (sFilterConfig->FilterIndex * SRAMCAN_FLE_SIZE));
+            FilterAddress =
+                (uint32_t
+                     *)(hfdcan->msgRam.ExtendedFilterSA + (sFilterConfig->FilterIndex * SRAMCAN_FLE_SIZE));
 
             /* Write filter element to the message RAM */
             *FilterAddress = FilterElementW1;

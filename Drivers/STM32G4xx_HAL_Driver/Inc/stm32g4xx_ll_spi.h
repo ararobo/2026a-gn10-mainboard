@@ -1427,7 +1427,7 @@ __STATIC_INLINE void LL_SPI_TransmitData16(SPI_TypeDef *SPIx, uint16_t TxData)
     __IO uint16_t *spidr = ((__IO uint16_t *)&SPIx->DR);
     *spidr               = TxData;
 #else
-    SPIx->DR = TxData;
+    SPIx->DR                     = TxData;
 #endif /* __GNUC__ */
 }
 

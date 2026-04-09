@@ -87,7 +87,8 @@ typedef struct {
 #define PWR_PVD_MODE_IT_FALLING \
     ((uint32_t)0x00010002) /*!< External Interrupt Mode with Falling edge trigger detection */
 #define PWR_PVD_MODE_IT_RISING_FALLING \
-    ((uint32_t)0x00010003              \
+    (                                  \
+        (uint32_t)0x00010003           \
     ) /*!< External Interrupt Mode with Rising/Falling edge trigger detection */
 #define PWR_PVD_MODE_EVENT_RISING \
     ((uint32_t)0x00020001) /*!< Event Mode with Rising edge trigger detection */
@@ -374,7 +375,7 @@ void HAL_PWR_DisableBkUpAccess(void);
  */
 
 /* Peripheral Control functions  ************************************************/
-HAL_StatusTypeDef HAL_PWR_ConfigPVD(PWR_PVDTypeDef const *sConfigPVD);
+HAL_StatusTypeDef HAL_PWR_ConfigPVD(PWR_PVDTypeDef const* sConfigPVD);
 void HAL_PWR_EnablePVD(void);
 void HAL_PWR_DisablePVD(void);
 

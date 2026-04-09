@@ -517,8 +517,7 @@ HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start_DMA(
     if ((channel_1_state == HAL_TIM_CHANNEL_STATE_BUSY) ||
         (complementary_channel_1_state == HAL_TIM_CHANNEL_STATE_BUSY)) {
         return HAL_BUSY;
-    } else if ((channel_1_state == HAL_TIM_CHANNEL_STATE_READY) &&
-               (complementary_channel_1_state == HAL_TIM_CHANNEL_STATE_READY)) {
+    } else if ((channel_1_state == HAL_TIM_CHANNEL_STATE_READY) && (complementary_channel_1_state == HAL_TIM_CHANNEL_STATE_READY)) {
         if ((pData == NULL) || (Length == 0U)) {
             return HAL_ERROR;
         } else {

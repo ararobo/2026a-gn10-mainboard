@@ -2312,32 +2312,37 @@ typedef struct {
  * @param  __DT__ deadtime duration (in ns)
  * @retval DTG[0:7]
  */
-#define __LL_TIM_CALC_DEADTIME(__TIMCLK__, __CKD__, __DT__)                                        \
-    ((((uint64_t)((__DT__) * 1000U)) < ((DT_DELAY_1 + 1U) * TIM_CALC_DTS((__TIMCLK__), (__CKD__))) \
-     )                                                                                             \
-         ? (uint8_t)(((uint64_t)((__DT__) * 1000U) / TIM_CALC_DTS((__TIMCLK__), (__CKD__))) &      \
-                     DT_DELAY_1)                                                                   \
-     : (((uint64_t)((__DT__) * 1000U)) <                                                           \
-        ((64U + (DT_DELAY_2 + 1U)) * 2U * TIM_CALC_DTS((__TIMCLK__), (__CKD__))))                  \
-         ? (uint8_t)(DT_RANGE_2 | ((uint8_t)((uint8_t)((((uint64_t)((__DT__) * 1000U)) /           \
-                                                        TIM_CALC_DTS((__TIMCLK__), (__CKD__))) >>  \
-                                                       1U) -                                       \
-                                             (uint8_t)64) &                                        \
-                                   DT_DELAY_2))                                                    \
-     : (((uint64_t)((__DT__) * 1000U)) <                                                           \
-        ((32U + (DT_DELAY_3 + 1U)) * 8U * TIM_CALC_DTS((__TIMCLK__), (__CKD__))))                  \
-         ? (uint8_t)(DT_RANGE_3 | ((uint8_t)((uint8_t)(((((uint64_t)(__DT__) * 1000U)) /           \
-                                                        TIM_CALC_DTS((__TIMCLK__), (__CKD__))) >>  \
-                                                       3U) -                                       \
-                                             (uint8_t)32) &                                        \
-                                   DT_DELAY_3))                                                    \
-     : (((uint64_t)((__DT__) * 1000U)) <                                                           \
-        ((32U + (DT_DELAY_4 + 1U)) * 16U * TIM_CALC_DTS((__TIMCLK__), (__CKD__))))                 \
-         ? (uint8_t)(DT_RANGE_4 | ((uint8_t)((uint8_t)(((((uint64_t)(__DT__) * 1000U)) /           \
-                                                        TIM_CALC_DTS((__TIMCLK__), (__CKD__))) >>  \
-                                                       4U) -                                       \
-                                             (uint8_t)32) &                                        \
-                                   DT_DELAY_4))                                                    \
+#define __LL_TIM_CALC_DEADTIME(__TIMCLK__, __CKD__, __DT__)                                       \
+    ((((uint64_t)((__DT__)*1000U)) < ((DT_DELAY_1 + 1U) * TIM_CALC_DTS((__TIMCLK__), (__CKD__)))) \
+         ? (uint8_t                                                                               \
+           )(((uint64_t)((__DT__)*1000U) / TIM_CALC_DTS((__TIMCLK__), (__CKD__))) & DT_DELAY_1)   \
+     : (((uint64_t)((__DT__)*1000U)) <                                                            \
+        ((64U + (DT_DELAY_2 + 1U)) * 2U * TIM_CALC_DTS((__TIMCLK__), (__CKD__))))                 \
+         ? (uint8_t                                                                               \
+           )(DT_RANGE_2 |                                                                         \
+             ((uint8_t                                                                            \
+              )((uint8_t                                                                          \
+                )((((uint64_t)((__DT__)*1000U)) / TIM_CALC_DTS((__TIMCLK__), (__CKD__))) >> 1U) - \
+                (uint8_t)64) &                                                                    \
+              DT_DELAY_2))                                                                        \
+     : (((uint64_t)((__DT__)*1000U)) <                                                            \
+        ((32U + (DT_DELAY_3 + 1U)) * 8U * TIM_CALC_DTS((__TIMCLK__), (__CKD__))))                 \
+         ? (uint8_t                                                                               \
+           )(DT_RANGE_3 |                                                                         \
+             ((uint8_t                                                                            \
+              )((uint8_t                                                                          \
+                )(((((uint64_t)(__DT__)*1000U)) / TIM_CALC_DTS((__TIMCLK__), (__CKD__))) >> 3U) - \
+                (uint8_t)32) &                                                                    \
+              DT_DELAY_3))                                                                        \
+     : (((uint64_t)((__DT__)*1000U)) <                                                            \
+        ((32U + (DT_DELAY_4 + 1U)) * 16U * TIM_CALC_DTS((__TIMCLK__), (__CKD__))))                \
+         ? (uint8_t                                                                               \
+           )(DT_RANGE_4 |                                                                         \
+             ((uint8_t                                                                            \
+              )((uint8_t                                                                          \
+                )(((((uint64_t)(__DT__)*1000U)) / TIM_CALC_DTS((__TIMCLK__), (__CKD__))) >> 4U) - \
+                (uint8_t)32) &                                                                    \
+              DT_DELAY_4))                                                                        \
          : 0U)
 
 /**
@@ -2376,9 +2381,9 @@ typedef struct {
  * @param  __FREQ__ output signal frequency (in Hz)
  * @retval  Auto-reload value  (between Min_Data=0 and Max_Data=65535)
  */
-#define __LL_TIM_CALC_ARR_DITHER(__TIMCLK__, __PSC__, __FREQ__)                                 \
-    ((((__TIMCLK__) / ((__PSC__) + 1U)) >= (__FREQ__))                                          \
-         ? (uint32_t)((((uint64_t)(__TIMCLK__) * 16U / ((__FREQ__) * ((__PSC__) + 1U))) - 16U)) \
+#define __LL_TIM_CALC_ARR_DITHER(__TIMCLK__, __PSC__, __FREQ__)                               \
+    ((((__TIMCLK__) / ((__PSC__) + 1U)) >= (__FREQ__))                                        \
+         ? (uint32_t)((((uint64_t)(__TIMCLK__)*16U / ((__FREQ__) * ((__PSC__) + 1U))) - 16U)) \
          : 0U)
 
 /**
@@ -2390,9 +2395,10 @@ typedef struct {
  * @param  __DELAY__ timer output compare active/inactive delay (in us)
  * @retval Compare value  (between Min_Data=0 and Max_Data=65535)
  */
-#define __LL_TIM_CALC_DELAY(__TIMCLK__, __PSC__, __DELAY__)        \
-    ((uint32_t)(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__)) / \
-                ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
+#define __LL_TIM_CALC_DELAY(__TIMCLK__, __PSC__, __DELAY__) \
+    ((uint32_t                                              \
+    )(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__)) /    \
+      ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
 
 /**
  * @brief  HELPER macro calculating the compare value, with dithering feature enabled, to achieve
@@ -2403,9 +2409,10 @@ typedef struct {
  * @param  __DELAY__ timer output compare active/inactive delay (in us)
  * @retval Compare value  (between Min_Data=0 and Max_Data=65535)
  */
-#define __LL_TIM_CALC_DELAY_DITHER(__TIMCLK__, __PSC__, __DELAY__)       \
-    ((uint32_t)(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__) * 16U) / \
-                ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
+#define __LL_TIM_CALC_DELAY_DITHER(__TIMCLK__, __PSC__, __DELAY__) \
+    ((uint32_t                                                     \
+    )(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__)*16U) /       \
+      ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
 
 /**
  * @brief  HELPER macro calculating the auto-reload value to achieve the required pulse duration
@@ -2417,9 +2424,10 @@ typedef struct {
  * @param  __PULSE__ pulse duration (in us)
  * @retval Auto-reload value  (between Min_Data=0 and Max_Data=65535)
  */
-#define __LL_TIM_CALC_PULSE(__TIMCLK__, __PSC__, __DELAY__, __PULSE__)      \
-    ((uint32_t)(__LL_TIM_CALC_DELAY((__TIMCLK__), (__PSC__), (__PULSE__)) + \
-                __LL_TIM_CALC_DELAY((__TIMCLK__), (__PSC__), (__DELAY__))))
+#define __LL_TIM_CALC_PULSE(__TIMCLK__, __PSC__, __DELAY__, __PULSE__) \
+    ((uint32_t                                                         \
+    )(__LL_TIM_CALC_DELAY((__TIMCLK__), (__PSC__), (__PULSE__)) +      \
+      __LL_TIM_CALC_DELAY((__TIMCLK__), (__PSC__), (__DELAY__))))
 
 /**
  * @brief  HELPER macro calculating the auto-reload value, with dithering feature enabled, to
@@ -2431,9 +2439,10 @@ typedef struct {
  * @param  __PULSE__ pulse duration (in us)
  * @retval Auto-reload value  (between Min_Data=0 and Max_Data=65535)
  */
-#define __LL_TIM_CALC_PULSE_DITHER(__TIMCLK__, __PSC__, __DELAY__, __PULSE__)      \
-    ((uint32_t)(__LL_TIM_CALC_DELAY_DITHER((__TIMCLK__), (__PSC__), (__PULSE__)) + \
-                __LL_TIM_CALC_DELAY_DITHER((__TIMCLK__), (__PSC__), (__DELAY__))))
+#define __LL_TIM_CALC_PULSE_DITHER(__TIMCLK__, __PSC__, __DELAY__, __PULSE__) \
+    ((uint32_t                                                                \
+    )(__LL_TIM_CALC_DELAY_DITHER((__TIMCLK__), (__PSC__), (__PULSE__)) +      \
+      __LL_TIM_CALC_DELAY_DITHER((__TIMCLK__), (__PSC__), (__DELAY__))))
 
 /**
  * @brief  HELPER macro retrieving the ratio of the input capture prescaler

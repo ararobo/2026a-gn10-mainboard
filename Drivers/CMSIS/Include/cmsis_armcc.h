@@ -34,8 +34,7 @@
 #endif
 
 /* CMSIS compiler control architecture macros */
-#if ((defined(__TARGET_ARCH_6_M) && (__TARGET_ARCH_6_M == 1)) || \
-     (defined(__TARGET_ARCH_6S_M) && (__TARGET_ARCH_6S_M == 1)))
+#if ((defined(__TARGET_ARCH_6_M) && (__TARGET_ARCH_6_M == 1)) || (defined(__TARGET_ARCH_6S_M) && (__TARGET_ARCH_6S_M == 1)))
 #define __ARM_ARCH_6M__ 1
 #endif
 
@@ -87,19 +86,19 @@
 #define __PACKED_UNION __packed union
 #endif
 #ifndef __UNALIGNED_UINT32 /* deprecated */
-#define __UNALIGNED_UINT32(x) (*((__packed uint32_t*)(x)))
+#define __UNALIGNED_UINT32(x) (*((__packed uint32_t *)(x)))
 #endif
 #ifndef __UNALIGNED_UINT16_WRITE
-#define __UNALIGNED_UINT16_WRITE(addr, val) ((*((__packed uint16_t*)(addr))) = (val))
+#define __UNALIGNED_UINT16_WRITE(addr, val) ((*((__packed uint16_t *)(addr))) = (val))
 #endif
 #ifndef __UNALIGNED_UINT16_READ
-#define __UNALIGNED_UINT16_READ(addr) (*((const __packed uint16_t*)(addr)))
+#define __UNALIGNED_UINT16_READ(addr) (*((const __packed uint16_t *)(addr)))
 #endif
 #ifndef __UNALIGNED_UINT32_WRITE
-#define __UNALIGNED_UINT32_WRITE(addr, val) ((*((__packed uint32_t*)(addr))) = (val))
+#define __UNALIGNED_UINT32_WRITE(addr, val) ((*((__packed uint32_t *)(addr))) = (val))
 #endif
 #ifndef __UNALIGNED_UINT32_READ
-#define __UNALIGNED_UINT32_READ(addr) (*((const __packed uint32_t*)(addr)))
+#define __UNALIGNED_UINT32_READ(addr) (*((const __packed uint32_t *)(addr)))
 #endif
 #ifndef __ALIGNED
 #define __ALIGNED(x) __attribute__((aligned(x)))
@@ -274,8 +273,7 @@ __STATIC_INLINE void __set_PRIMASK(uint32_t priMask)
     __regPriMask = (priMask);
 }
 
-#if ((defined(__ARM_ARCH_7M__) && (__ARM_ARCH_7M__ == 1)) || \
-     (defined(__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1)))
+#if ((defined(__ARM_ARCH_7M__) && (__ARM_ARCH_7M__ == 1)) || (defined(__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1)))
 
 /**
   \brief   Enable FIQ
@@ -357,8 +355,7 @@ __STATIC_INLINE void __set_FAULTMASK(uint32_t faultMask)
  */
 __STATIC_INLINE uint32_t __get_FPSCR(void)
 {
-#if ((defined(__FPU_PRESENT) && (__FPU_PRESENT == 1U)) && \
-     (defined(__FPU_USED) && (__FPU_USED == 1U)))
+#if ((defined(__FPU_PRESENT) && (__FPU_PRESENT == 1U)) && (defined(__FPU_USED) && (__FPU_USED == 1U)))
     register uint32_t __regfpscr __ASM("fpscr");
     return (__regfpscr);
 #else
@@ -373,8 +370,7 @@ __STATIC_INLINE uint32_t __get_FPSCR(void)
  */
 __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
 {
-#if ((defined(__FPU_PRESENT) && (__FPU_PRESENT == 1U)) && \
-     (defined(__FPU_USED) && (__FPU_USED == 1U)))
+#if ((defined(__FPU_PRESENT) && (__FPU_PRESENT == 1U)) && (defined(__FPU_USED) && (__FPU_USED == 1U)))
     register uint32_t __regfpscr __ASM("fpscr");
     __regfpscr = (fpscr);
 #else
@@ -478,7 +474,8 @@ __attribute__((section(".rev16_text"))) __STATIC_INLINE __ASM uint32_t __REV16(u
   example, 0x0080 becomes 0x8000. \param [in]    value  Value to reverse \return Reversed value
  */
 #ifndef __NO_EMBEDDED_ASM
-__attribute__((section(".revsh_text"))) __STATIC_INLINE __ASM int16_t __REVSH(int16_t value){
+__attribute__((section(".revsh_text"))) __STATIC_INLINE __ASM int16_t __REVSH(int16_t value)
+{
     revsh r0, r0 bx lr
 }
 #endif
@@ -506,8 +503,7 @@ __attribute__((section(".revsh_text"))) __STATIC_INLINE __ASM int16_t __REVSH(in
   \param [in]    value  Value to reverse
   \return               Reversed value
  */
-#if ((defined(__ARM_ARCH_7M__) && (__ARM_ARCH_7M__ == 1)) || \
-     (defined(__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1)))
+#if ((defined(__ARM_ARCH_7M__) && (__ARM_ARCH_7M__ == 1)) || (defined(__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1)))
 #define __RBIT __rbit
 #else
 __attribute__((always_inline)) __STATIC_INLINE uint32_t __RBIT(uint32_t value)
@@ -534,8 +530,7 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __RBIT(uint32_t value)
  */
 #define __CLZ __clz
 
-#if ((defined(__ARM_ARCH_7M__) && (__ARM_ARCH_7M__ == 1)) || \
-     (defined(__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1)))
+#if ((defined(__ARM_ARCH_7M__) && (__ARM_ARCH_7M__ == 1)) || (defined(__ARM_ARCH_7EM__) && (__ARM_ARCH_7EM__ == 1)))
 
 /**
   \brief   LDR Exclusive (8 bit)
@@ -653,7 +648,8 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __RBIT(uint32_t value)
   \return               Rotated value
  */
 #ifndef __NO_EMBEDDED_ASM
-__attribute__((section(".rrx_text"))) __STATIC_INLINE __ASM uint32_t __RRX(uint32_t value){
+__attribute__((section(".rrx_text"))) __STATIC_INLINE __ASM uint32_t __RRX(uint32_t value)
+{
     rrx r0, r0 bx lr
 }
 #endif

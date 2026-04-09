@@ -868,9 +868,9 @@ __STATIC_INLINE uint32_t
 LL_DMAMUX_GetSyncRequestNb(const DMAMUX_Channel_TypeDef *DMAMUXx, uint32_t Channel)
 {
     (void)(DMAMUXx);
-    return (uint32_t)(((READ_BIT((DMAMUX1_Channel0 + Channel)->CCR, DMAMUX_CxCR_NBREQ)) >>
-                       DMAMUX_CxCR_NBREQ_Pos) +
-                      1U);
+    return (uint32_t
+    )(((READ_BIT((DMAMUX1_Channel0 + Channel)->CCR, DMAMUX_CxCR_NBREQ)) >> DMAMUX_CxCR_NBREQ_Pos) +
+      1U);
 }
 
 /**
@@ -1250,8 +1250,8 @@ __STATIC_INLINE void LL_DMAMUX_EnableRequestGen(
 {
     (void)(DMAMUXx);
     SET_BIT(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_GE
     );
@@ -1274,8 +1274,8 @@ __STATIC_INLINE void LL_DMAMUX_DisableRequestGen(
 {
     (void)(DMAMUXx);
     CLEAR_BIT(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_GE
     );
@@ -1298,8 +1298,8 @@ LL_DMAMUX_IsEnabledRequestGen(const DMAMUX_Channel_TypeDef *DMAMUXx, uint32_t Re
     (void)(DMAMUXx);
     return (
         (READ_BIT(
-             ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                       (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+             ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+              )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
                  ->RGCR,
              DMAMUX_RGxCR_GE
          ) == (DMAMUX_RGxCR_GE))
@@ -1330,8 +1330,8 @@ __STATIC_INLINE void LL_DMAMUX_SetRequestGenPolarity(
 {
     UNUSED(DMAMUXx);
     MODIFY_REG(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_GPOL,
         Polarity
@@ -1358,8 +1358,8 @@ LL_DMAMUX_GetRequestGenPolarity(const DMAMUX_Channel_TypeDef *DMAMUXx, uint32_t 
 {
     UNUSED(DMAMUXx);
     return (READ_BIT(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_GPOL
     ));
@@ -1384,8 +1384,8 @@ __STATIC_INLINE void LL_DMAMUX_SetGenRequestNb(
 {
     UNUSED(DMAMUXx);
     MODIFY_REG(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_GNBREQ,
         (RequestNb - 1U) << DMAMUX_RGxCR_GNBREQ_Pos
@@ -1409,8 +1409,8 @@ LL_DMAMUX_GetGenRequestNb(const DMAMUX_Channel_TypeDef *DMAMUXx, uint32_t Reques
     UNUSED(DMAMUXx);
     return (
         (READ_BIT(
-             ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                       (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+             ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+              )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
                  ->RGCR,
              DMAMUX_RGxCR_GNBREQ
          ) >>
@@ -1459,8 +1459,8 @@ __STATIC_INLINE void LL_DMAMUX_SetRequestSignalID(
 {
     UNUSED(DMAMUXx);
     MODIFY_REG(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_SIG_ID,
         RequestSignalID
@@ -1504,8 +1504,8 @@ LL_DMAMUX_GetRequestSignalID(const DMAMUX_Channel_TypeDef *DMAMUXx, uint32_t Req
 {
     UNUSED(DMAMUXx);
     return (READ_BIT(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_SIG_ID
     ));
@@ -2173,8 +2173,8 @@ __STATIC_INLINE void LL_DMAMUX_EnableIT_RGO(
 {
     UNUSED(DMAMUXx);
     SET_BIT(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_OIE
     );
@@ -2197,8 +2197,8 @@ __STATIC_INLINE void LL_DMAMUX_DisableIT_RGO(
 {
     UNUSED(DMAMUXx);
     CLEAR_BIT(
-        ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                  (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+        ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+         )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
             ->RGCR,
         DMAMUX_RGxCR_OIE
     );
@@ -2222,8 +2222,8 @@ LL_DMAMUX_IsEnabledIT_RGO(const DMAMUX_Channel_TypeDef *DMAMUXx, uint32_t Reques
     UNUSED(DMAMUXx);
     return (
         (READ_BIT(
-             ((DMAMUX_RequestGen_TypeDef *)((uint32_t)((uint32_t)DMAMUX1_RequestGenerator0 +
-                                                       (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
+             ((DMAMUX_RequestGen_TypeDef *)((uint32_t
+              )((uint32_t)DMAMUX1_RequestGenerator0 + (DMAMUX_RGCR_SIZE * (RequestGenChannel)))))
                  ->RGCR,
              DMAMUX_RGxCR_OIE
          ) == (DMAMUX_RGxCR_OIE))

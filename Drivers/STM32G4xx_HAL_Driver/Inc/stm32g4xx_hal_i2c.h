@@ -171,11 +171,11 @@ typedef enum {
  * @{
  */
 typedef struct __I2C_HandleTypeDef {
-    I2C_TypeDef *Instance; /*!< I2C registers base address                */
+    I2C_TypeDef* Instance; /*!< I2C registers base address                */
 
     I2C_InitTypeDef Init; /*!< I2C communication parameters              */
 
-    uint8_t *pBuffPtr; /*!< Pointer to I2C transfer buffer            */
+    uint8_t* pBuffPtr; /*!< Pointer to I2C transfer buffer            */
 
     uint16_t XferSize; /*!< I2C transfer size                         */
 
@@ -187,13 +187,13 @@ typedef struct __I2C_HandleTypeDef {
     __IO uint32_t PreviousState; /*!< I2C communication Previous state          */
 
     HAL_StatusTypeDef (*XferISR)(
-        struct __I2C_HandleTypeDef *hi2c, uint32_t ITFlags, uint32_t ITSources
+        struct __I2C_HandleTypeDef* hi2c, uint32_t ITFlags, uint32_t ITSources
     );
     /*!< I2C transfer IRQ handler function pointer */
 
-    DMA_HandleTypeDef *hdmatx; /*!< I2C Tx DMA handle parameters              */
+    DMA_HandleTypeDef* hdmatx; /*!< I2C Tx DMA handle parameters              */
 
-    DMA_HandleTypeDef *hdmarx; /*!< I2C Rx DMA handle parameters              */
+    DMA_HandleTypeDef* hdmarx; /*!< I2C Rx DMA handle parameters              */
 
     HAL_LockTypeDef Lock; /*!< I2C locking object                        */
 
@@ -210,33 +210,33 @@ typedef struct __I2C_HandleTypeDef {
     __IO uint32_t Memaddress; /*!< I2C Target memory address                 */
 
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
-    void (*MasterTxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*MasterTxCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Master Tx Transfer completed callback */
-    void (*MasterRxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*MasterRxCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Master Rx Transfer completed callback */
-    void (*SlaveTxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*SlaveTxCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Slave Tx Transfer completed callback  */
-    void (*SlaveRxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*SlaveRxCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Slave Rx Transfer completed callback  */
-    void (*ListenCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*ListenCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Listen Complete callback              */
-    void (*MemTxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*MemTxCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Memory Tx Transfer completed callback */
-    void (*MemRxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*MemRxCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Memory Rx Transfer completed callback */
-    void (*ErrorCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*ErrorCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Error callback                        */
-    void (*AbortCpltCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*AbortCpltCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Abort callback                        */
 
     void (*AddrCallback)(
-        struct __I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode
+        struct __I2C_HandleTypeDef* hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode
     );
     /*!< I2C Slave Address Match callback */
 
-    void (*MspInitCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*MspInitCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Msp Init callback                     */
-    void (*MspDeInitCallback)(struct __I2C_HandleTypeDef *hi2c);
+    void (*MspDeInitCallback)(struct __I2C_HandleTypeDef* hi2c);
     /*!< I2C Msp DeInit callback                   */
 
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
@@ -265,10 +265,10 @@ typedef enum {
 /**
  * @brief  HAL I2C Callback pointer definition
  */
-typedef void (*pI2C_CallbackTypeDef)(I2C_HandleTypeDef *hi2c);
+typedef void (*pI2C_CallbackTypeDef)(I2C_HandleTypeDef* hi2c);
 /*!< pointer to an I2C callback function */
 typedef void (*pI2C_AddrCallbackTypeDef)(
-    I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode
+    I2C_HandleTypeDef* hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode
 );
 /*!< pointer to an I2C Address Match callback function */
 
@@ -592,24 +592,24 @@ typedef void (*pI2C_AddrCallbackTypeDef)(
  * @{
  */
 /* Initialization and de-initialization functions******************************/
-HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c);
-HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c);
+HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef* hi2c);
+HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_MspInit(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_MspDeInit(I2C_HandleTypeDef* hi2c);
 
 /* Callbacks Register/UnRegister functions  ***********************************/
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
 HAL_StatusTypeDef HAL_I2C_RegisterCallback(
-    I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID, pI2C_CallbackTypeDef pCallback
+    I2C_HandleTypeDef* hi2c, HAL_I2C_CallbackIDTypeDef CallbackID, pI2C_CallbackTypeDef pCallback
 );
 HAL_StatusTypeDef HAL_I2C_UnRegisterCallback(
-    I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID
+    I2C_HandleTypeDef* hi2c, HAL_I2C_CallbackIDTypeDef CallbackID
 );
 
 HAL_StatusTypeDef HAL_I2C_RegisterAddrCallback(
-    I2C_HandleTypeDef *hi2c, pI2C_AddrCallbackTypeDef pCallback
+    I2C_HandleTypeDef* hi2c, pI2C_AddrCallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef *hi2c);
+HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef* hi2c);
 #endif /* USE_HAL_I2C_REGISTER_CALLBACKS */
 /**
  * @}
@@ -621,136 +621,136 @@ HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef *hi2c);
 /* IO operation functions  ****************************************************/
 /******* Blocking mode: Polling */
 HAL_StatusTypeDef HAL_I2C_Master_Transmit(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint8_t* pData, uint16_t Size, uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_I2C_Master_Receive(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint8_t* pData, uint16_t Size, uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Transmit(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size, uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Receive(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size, uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_I2C_Mem_Write(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
     uint16_t MemAddress,
     uint16_t MemAddSize,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size,
     uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_I2C_Mem_Read(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
     uint16_t MemAddress,
     uint16_t MemAddSize,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size,
     uint32_t Timeout
 );
 HAL_StatusTypeDef HAL_I2C_IsDeviceReady(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout
 );
 
 /******* Non-Blocking mode: Interrupt */
 HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint8_t* pData, uint16_t Size
 );
 HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint8_t* pData, uint16_t Size
 );
-HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);
-HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size);
+HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size);
 HAL_StatusTypeDef HAL_I2C_Mem_Write_IT(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
     uint16_t MemAddress,
     uint16_t MemAddSize,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size
 );
 HAL_StatusTypeDef HAL_I2C_Mem_Read_IT(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
     uint16_t MemAddress,
     uint16_t MemAddSize,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size
 );
 
 HAL_StatusTypeDef HAL_I2C_Master_Seq_Transmit_IT(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size,
     uint32_t XferOptions
 );
 HAL_StatusTypeDef HAL_I2C_Master_Seq_Receive_IT(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size,
     uint32_t XferOptions
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Seq_Transmit_IT(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size, uint32_t XferOptions
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Seq_Receive_IT(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size, uint32_t XferOptions
 );
-HAL_StatusTypeDef HAL_I2C_EnableListen_IT(I2C_HandleTypeDef *hi2c);
-HAL_StatusTypeDef HAL_I2C_DisableListen_IT(I2C_HandleTypeDef *hi2c);
-HAL_StatusTypeDef HAL_I2C_Master_Abort_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress);
+HAL_StatusTypeDef HAL_I2C_EnableListen_IT(I2C_HandleTypeDef* hi2c);
+HAL_StatusTypeDef HAL_I2C_DisableListen_IT(I2C_HandleTypeDef* hi2c);
+HAL_StatusTypeDef HAL_I2C_Master_Abort_IT(I2C_HandleTypeDef* hi2c, uint16_t DevAddress);
 
 /******* Non-Blocking mode: DMA */
 HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint8_t* pData, uint16_t Size
 );
 HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(
-    I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size
+    I2C_HandleTypeDef* hi2c, uint16_t DevAddress, uint8_t* pData, uint16_t Size
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Transmit_DMA(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size
 );
-HAL_StatusTypeDef HAL_I2C_Slave_Receive_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_I2C_Slave_Receive_DMA(I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size);
 HAL_StatusTypeDef HAL_I2C_Mem_Write_DMA(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
     uint16_t MemAddress,
     uint16_t MemAddSize,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size
 );
 HAL_StatusTypeDef HAL_I2C_Mem_Read_DMA(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
     uint16_t MemAddress,
     uint16_t MemAddSize,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size
 );
 
 HAL_StatusTypeDef HAL_I2C_Master_Seq_Transmit_DMA(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size,
     uint32_t XferOptions
 );
 HAL_StatusTypeDef HAL_I2C_Master_Seq_Receive_DMA(
-    I2C_HandleTypeDef *hi2c,
+    I2C_HandleTypeDef* hi2c,
     uint16_t DevAddress,
-    uint8_t *pData,
+    uint8_t* pData,
     uint16_t Size,
     uint32_t XferOptions
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Seq_Transmit_DMA(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size, uint32_t XferOptions
 );
 HAL_StatusTypeDef HAL_I2C_Slave_Seq_Receive_DMA(
-    I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions
+    I2C_HandleTypeDef* hi2c, uint8_t* pData, uint16_t Size, uint32_t XferOptions
 );
 /**
  * @}
@@ -760,20 +760,20 @@ HAL_StatusTypeDef HAL_I2C_Slave_Seq_Receive_DMA(
  * @{
  */
 /******* I2C IRQHandler and Callbacks used in non blocking modes (Interrupt and DMA) */
-void HAL_I2C_EV_IRQHandler(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c);
+void HAL_I2C_EV_IRQHandler(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef* hi2c);
 void HAL_I2C_AddrCallback(
-    I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode
+    I2C_HandleTypeDef* hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode
 );
-void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c);
+void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_ErrorCallback(I2C_HandleTypeDef* hi2c);
+void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef* hi2c);
 /**
  * @}
  */
@@ -782,9 +782,9 @@ void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c);
  * @{
  */
 /* Peripheral State, Mode and Error functions  *********************************/
-HAL_I2C_StateTypeDef HAL_I2C_GetState(const I2C_HandleTypeDef *hi2c);
-HAL_I2C_ModeTypeDef HAL_I2C_GetMode(const I2C_HandleTypeDef *hi2c);
-uint32_t HAL_I2C_GetError(const I2C_HandleTypeDef *hi2c);
+HAL_I2C_StateTypeDef HAL_I2C_GetState(const I2C_HandleTypeDef* hi2c);
+HAL_I2C_ModeTypeDef HAL_I2C_GetMode(const I2C_HandleTypeDef* hi2c);
+uint32_t HAL_I2C_GetError(const I2C_HandleTypeDef* hi2c);
 
 /**
  * @}
@@ -844,10 +844,10 @@ uint32_t HAL_I2C_GetError(const I2C_HandleTypeDef *hi2c);
 #define IS_I2C_TRANSFER_OTHER_OPTIONS_REQUEST(REQUEST) \
     (((REQUEST) == I2C_OTHER_FRAME) || ((REQUEST) == I2C_OTHER_AND_LAST_FRAME))
 
-#define I2C_RESET_CR2(__HANDLE__)                                                               \
-    ((__HANDLE__)->Instance->CR2 &=                                                             \
-     (uint32_t) ~((uint32_t)(I2C_CR2_SADD | I2C_CR2_HEAD10R | I2C_CR2_NBYTES | I2C_CR2_RELOAD | \
-                             I2C_CR2_RD_WRN)))
+#define I2C_RESET_CR2(__HANDLE__)                                                              \
+    ((__HANDLE__)->Instance->CR2 &=                                                            \
+     (uint32_t)~((uint32_t)(I2C_CR2_SADD | I2C_CR2_HEAD10R | I2C_CR2_NBYTES | I2C_CR2_RELOAD | \
+                            I2C_CR2_RD_WRN)))
 
 #define I2C_GET_ADDR_MATCH(__HANDLE__) \
     ((uint16_t)(((__HANDLE__)->Instance->ISR & I2C_ISR_ADDCODE) >> 16U))

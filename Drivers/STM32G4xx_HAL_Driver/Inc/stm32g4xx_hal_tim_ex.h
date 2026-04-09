@@ -716,7 +716,7 @@ typedef struct {
  * @retval Prescaler value  (between Min_Data=0 and Max_Data=65535)
  */
 #define __HAL_TIM_CALC_PSC(__TIMCLK__, __CNTCLK__) \
-    ((__TIMCLK__) >= (__CNTCLK__)) ? (uint32_t)((__TIMCLK__) / (__CNTCLK__) - 1U) : 0U
+    ((__TIMCLK__) >= (__CNTCLK__)) ? (uint32_t)((__TIMCLK__) / (__CNTCLK__)-1U) : 0U
 
 /**
  * @brief  HELPER macro calculating the auto-reload value to achieve the required output signal
@@ -742,9 +742,9 @@ typedef struct {
  * @param  __FREQ__ output signal frequency (in Hz)
  * @retval  Auto-reload value  (between Min_Data=0 and Max_Data=65519)
  */
-#define __HAL_TIM_CALC_PERIOD_DITHER(__TIMCLK__, __PSC__, __FREQ__)                         \
-    (((__TIMCLK__) / ((__PSC__) + 1U)) >= (__FREQ__))                                       \
-        ? (uint32_t)(((uint64_t)(__TIMCLK__) * 16 / ((__FREQ__) * ((__PSC__) + 1U)) - 16U)) \
+#define __HAL_TIM_CALC_PERIOD_DITHER(__TIMCLK__, __PSC__, __FREQ__)                       \
+    (((__TIMCLK__) / ((__PSC__) + 1U)) >= (__FREQ__))                                     \
+        ? (uint32_t)(((uint64_t)(__TIMCLK__)*16 / ((__FREQ__) * ((__PSC__) + 1U)) - 16U)) \
         : 0U
 
 /**
@@ -756,9 +756,10 @@ typedef struct {
  * @param  __DELAY__ timer output compare active/inactive delay (in us)
  * @retval Compare value  (between Min_Data=0 and Max_Data=65535)
  */
-#define __HAL_TIM_CALC_PULSE(__TIMCLK__, __PSC__, __DELAY__)       \
-    ((uint32_t)(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__)) / \
-                ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
+#define __HAL_TIM_CALC_PULSE(__TIMCLK__, __PSC__, __DELAY__) \
+    ((uint32_t                                               \
+    )(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__)) /     \
+      ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
 
 /**
  * @brief  HELPER macro calculating the compare value, with dithering feature enabled, to achieve
@@ -770,9 +771,10 @@ typedef struct {
  * @param  __DELAY__ timer output compare active/inactive delay (in us)
  * @retval Compare value  (between Min_Data=0 and Max_Data=65519)
  */
-#define __HAL_TIM_CALC_PULSE_DITHER(__TIMCLK__, __PSC__, __DELAY__)      \
-    ((uint32_t)(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__) * 16U) / \
-                ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
+#define __HAL_TIM_CALC_PULSE_DITHER(__TIMCLK__, __PSC__, __DELAY__) \
+    ((uint32_t                                                      \
+    )(((uint64_t)(__TIMCLK__) * (uint64_t)(__DELAY__)*16U) /        \
+      ((uint64_t)1000000U * (uint64_t)((__PSC__) + 1U))))
 
 /**
  * @brief  HELPER macro calculating the auto-reload value to achieve the required pulse duration
@@ -785,8 +787,9 @@ typedef struct {
  * @retval Auto-reload value  (between Min_Data=0 and Max_Data=65535)
  */
 #define __HAL_TIM_CALC_PERIOD_BY_DELAY(__TIMCLK__, __PSC__, __DELAY__, __PULSE__) \
-    ((uint32_t)(__HAL_TIM_CALC_PULSE((__TIMCLK__), (__PSC__), (__PULSE__)) +      \
-                __HAL_TIM_CALC_PULSE((__TIMCLK__), (__PSC__), (__DELAY__))))
+    ((uint32_t                                                                    \
+    )(__HAL_TIM_CALC_PULSE((__TIMCLK__), (__PSC__), (__PULSE__)) +                \
+      __HAL_TIM_CALC_PULSE((__TIMCLK__), (__PSC__), (__DELAY__))))
 
 /**
  * @brief  HELPER macro calculating the auto-reload value, with dithering feature enabled, to
@@ -800,8 +803,9 @@ typedef struct {
  * @retval Auto-reload value  (between Min_Data=0 and Max_Data=65519)
  */
 #define __HAL_TIM_CALC_PERIOD_DITHER_BY_DELAY(__TIMCLK__, __PSC__, __DELAY__, __PULSE__) \
-    ((uint32_t)(__HAL_TIM_CALC_PULSE_DITHER((__TIMCLK__), (__PSC__), (__PULSE__)) +      \
-                __HAL_TIM_CALC_PULSE_DITHER((__TIMCLK__), (__PSC__), (__DELAY__))))
+    ((uint32_t                                                                           \
+    )(__HAL_TIM_CALC_PULSE_DITHER((__TIMCLK__), (__PSC__), (__PULSE__)) +                \
+      __HAL_TIM_CALC_PULSE_DITHER((__TIMCLK__), (__PSC__), (__DELAY__))))
 
 /**
  * @}
@@ -812,7 +816,7 @@ typedef struct {
 /** @defgroup TIMEx_Private_Macros TIM Extended Private Macros
  * @{
  */
-#define IS_TIM_REMAP(__REMAP__) ((((__REMAP__) & 0xFFFC3FFFU) == 0x00000000U))
+#define IS_TIM_REMAP(__REMAP__) ((((__REMAP__)&0xFFFC3FFFU) == 0x00000000U))
 
 #define IS_TIM_BREAKINPUT(__BREAKINPUT__) \
     (((__BREAKINPUT__) == TIM_BREAKINPUT_BRK) || ((__BREAKINPUT__) == TIM_BREAKINPUT_BRK2))
@@ -842,7 +846,7 @@ typedef struct {
     (((__POLARITY__) == TIM_BREAKINPUTSOURCE_POLARITY_LOW) || \
      ((__POLARITY__) == TIM_BREAKINPUTSOURCE_POLARITY_HIGH))
 
-#define IS_TIM_TISEL(__TISEL__) ((((__TISEL__) & 0xF0F0F0F0U) == 0x00000000U))
+#define IS_TIM_TISEL(__TISEL__) ((((__TISEL__)&0xF0F0F0F0U) == 0x00000000U))
 
 #define IS_TIM_TISEL_TIX_INSTANCE(INSTANCE, CHANNEL) \
     (IS_TIM_CCX_INSTANCE(INSTANCE, CHANNEL) && ((CHANNEL) < TIM_CHANNEL_5))

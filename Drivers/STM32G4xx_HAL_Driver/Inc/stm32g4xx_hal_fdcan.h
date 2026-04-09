@@ -427,7 +427,7 @@ typedef struct __FDCAN_HandleTypeDef
 typedef struct
 #endif /* USE_HAL_FDCAN_REGISTER_CALLBACKS */
 {
-    FDCAN_GlobalTypeDef *Instance; /*!< Register base address     */
+    FDCAN_GlobalTypeDef* Instance; /*!< Register base address     */
 
     FDCAN_InitTypeDef Init; /*!< FDCAN required parameters */
 
@@ -444,35 +444,40 @@ typedef struct
 
 #if USE_HAL_FDCAN_REGISTER_CALLBACKS == 1
     void (*TxEventFifoCallback)(
-        struct __FDCAN_HandleTypeDef *hfdcan, uint32_t TxEventFifoITs
+        struct __FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs
     ); /*!< FDCAN Tx Event Fifo callback         */
     void (*RxFifo0Callback)(
-        struct __FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs
-    ); /*!< FDCAN Rx Fifo 0 callback             */
+        struct __FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs
+    ); /*!< FDCAN Rx Fifo 0 callback */
     void (*RxFifo1Callback)(
-        struct __FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs
-    ); /*!< FDCAN Rx Fifo 1 callback             */
-    void (*TxFifoEmptyCallback)(struct __FDCAN_HandleTypeDef *hfdcan
+        struct __FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs
+    ); /*!< FDCAN Rx Fifo 1 callback */
+    void (*TxFifoEmptyCallback)(
+        struct __FDCAN_HandleTypeDef* hfdcan
     ); /*!< FDCAN Tx Fifo Empty callback         */
     void (*TxBufferCompleteCallback)(
-        struct __FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes
+        struct __FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndexes
     ); /*!< FDCAN Tx Buffer complete callback    */
     void (*TxBufferAbortCallback)(
-        struct __FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes
+        struct __FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndexes
     ); /*!< FDCAN Tx Buffer abort callback       */
-    void (*HighPriorityMessageCallback)(struct __FDCAN_HandleTypeDef *hfdcan
+    void (*HighPriorityMessageCallback)(
+        struct __FDCAN_HandleTypeDef* hfdcan
     ); /*!< FDCAN High priority message callback */
-    void (*TimestampWraparoundCallback)(struct __FDCAN_HandleTypeDef *hfdcan
+    void (*TimestampWraparoundCallback)(
+        struct __FDCAN_HandleTypeDef* hfdcan
     ); /*!< FDCAN Timestamp wraparound callback  */
-    void (*TimeoutOccurredCallback)(struct __FDCAN_HandleTypeDef *hfdcan
+    void (*TimeoutOccurredCallback)(
+        struct __FDCAN_HandleTypeDef* hfdcan
     ); /*!< FDCAN Timeout occurred callback      */
-    void (*ErrorCallback)(struct __FDCAN_HandleTypeDef *hfdcan); /*!< FDCAN Error callback */
+    void (*ErrorCallback)(struct __FDCAN_HandleTypeDef* hfdcan); /*!< FDCAN Error callback */
     void (*ErrorStatusCallback)(
-        struct __FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs
+        struct __FDCAN_HandleTypeDef* hfdcan, uint32_t ErrorStatusITs
     ); /*!< FDCAN Error status callback          */
 
-    void (*MspInitCallback)(struct __FDCAN_HandleTypeDef *hfdcan); /*!< FDCAN Msp Init callback */
-    void (*MspDeInitCallback)(struct __FDCAN_HandleTypeDef *hfdcan
+    void (*MspInitCallback)(struct __FDCAN_HandleTypeDef* hfdcan); /*!< FDCAN Msp Init callback */
+    void (*MspDeInitCallback)(
+        struct __FDCAN_HandleTypeDef* hfdcan
     ); /*!< FDCAN Msp DeInit callback            */
 
 #endif /* USE_HAL_FDCAN_REGISTER_CALLBACKS */
@@ -498,25 +503,26 @@ typedef enum {
 /**
  * @brief  HAL FDCAN Callback pointer definition
  */
-typedef void (*pFDCAN_CallbackTypeDef)(FDCAN_HandleTypeDef *hfdcan
+typedef void (*pFDCAN_CallbackTypeDef)(
+    FDCAN_HandleTypeDef* hfdcan
 ); /*!< pointer to a common FDCAN callback function           */
 typedef void (*pFDCAN_TxEventFifoCallbackTypeDef)(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t TxEventFifoITs
+    FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs
 ); /*!< pointer to Tx event Fifo FDCAN callback function      */
 typedef void (*pFDCAN_RxFifo0CallbackTypeDef)(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs
+    FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs
 ); /*!< pointer to Rx Fifo 0 FDCAN callback function          */
 typedef void (*pFDCAN_RxFifo1CallbackTypeDef)(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs
+    FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs
 ); /*!< pointer to Rx Fifo 1 FDCAN callback function          */
 typedef void (*pFDCAN_TxBufferCompleteCallbackTypeDef)(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes
+    FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndexes
 ); /*!< pointer to Tx Buffer complete FDCAN callback function */
 typedef void (*pFDCAN_TxBufferAbortCallbackTypeDef)(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes
+    FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndexes
 ); /*!< pointer to Tx Buffer abort FDCAN callback function    */
 typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs
+    FDCAN_HandleTypeDef* hfdcan, uint32_t ErrorStatusITs
 ); /*!< pointer to Error Status callback function             */
 
 #endif /* USE_HAL_FDCAN_REGISTER_CALLBACKS */
@@ -533,28 +539,17 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
 /** @defgroup HAL_FDCAN_Error_Code HAL FDCAN Error Code
  * @{
  */
-#define HAL_FDCAN_ERROR_NONE \
-    ((uint32_t)0x00000000U) /*!< No error */
-#define HAL_FDCAN_ERROR_TIMEOUT \
-    ((uint32_t)0x00000001U) /*!< Timeout error */
-#define HAL_FDCAN_ERROR_NOT_INITIALIZED \
-    ((uint32_t)0x00000002U) /*!< Peripheral not initialized */
-#define HAL_FDCAN_ERROR_NOT_READY \
-    ((uint32_t)0x00000004U) /*!< Peripheral not ready */
-#define HAL_FDCAN_ERROR_NOT_STARTED \
-    ((uint32_t)0x00000008U) /*!< Peripheral not started */
-#define HAL_FDCAN_ERROR_NOT_SUPPORTED \
-    ((uint32_t)0x00000010U) /*!< Mode not supported */
-#define HAL_FDCAN_ERROR_PARAM \
-    ((uint32_t)0x00000020U) /*!< Parameter error */
-#define HAL_FDCAN_ERROR_PENDING \
-    ((uint32_t)0x00000040U) /*!< Pending operation */
-#define HAL_FDCAN_ERROR_RAM_ACCESS \
-    ((uint32_t)0x00000080U) /*!< Message RAM Access Failure */
-#define HAL_FDCAN_ERROR_FIFO_EMPTY \
-    ((uint32_t)0x00000100U) /*!< Get element from empty FIFO */
-#define HAL_FDCAN_ERROR_FIFO_FULL \
-    ((uint32_t)0x00000200U) /*!< Put element in full FIFO */
+#define HAL_FDCAN_ERROR_NONE            ((uint32_t)0x00000000U) /*!< No error */
+#define HAL_FDCAN_ERROR_TIMEOUT         ((uint32_t)0x00000001U) /*!< Timeout error */
+#define HAL_FDCAN_ERROR_NOT_INITIALIZED ((uint32_t)0x00000002U) /*!< Peripheral not initialized */
+#define HAL_FDCAN_ERROR_NOT_READY       ((uint32_t)0x00000004U) /*!< Peripheral not ready */
+#define HAL_FDCAN_ERROR_NOT_STARTED     ((uint32_t)0x00000008U) /*!< Peripheral not started */
+#define HAL_FDCAN_ERROR_NOT_SUPPORTED   ((uint32_t)0x00000010U) /*!< Mode not supported */
+#define HAL_FDCAN_ERROR_PARAM           ((uint32_t)0x00000020U) /*!< Parameter error */
+#define HAL_FDCAN_ERROR_PENDING         ((uint32_t)0x00000040U) /*!< Pending operation */
+#define HAL_FDCAN_ERROR_RAM_ACCESS      ((uint32_t)0x00000080U) /*!< Message RAM Access Failure */
+#define HAL_FDCAN_ERROR_FIFO_EMPTY      ((uint32_t)0x00000100U) /*!< Get element from empty FIFO */
+#define HAL_FDCAN_ERROR_FIFO_FULL       ((uint32_t)0x00000200U) /*!< Put element in full FIFO */
 #define HAL_FDCAN_ERROR_LOG_OVERFLOW \
     FDCAN_IR_ELO /*!< Overflow of CAN Error Logging Counter                                  */
 #define HAL_FDCAN_ERROR_RAM_WDG \
@@ -567,9 +562,8 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
     FDCAN_IR_ARA /*!< Access to Reserved Address                                             */
 
 #if USE_HAL_FDCAN_REGISTER_CALLBACKS == 1
-#define HAL_FDCAN_ERROR_INVALID_CALLBACK \
-    ((uint32_t)0x00000100U) /*!< Invalid Callback error */
-#endif                      /* USE_HAL_FDCAN_REGISTER_CALLBACKS */
+#define HAL_FDCAN_ERROR_INVALID_CALLBACK ((uint32_t)0x00000100U) /*!< Invalid Callback error */
+#endif /* USE_HAL_FDCAN_REGISTER_CALLBACKS */
 /**
  * @}
  */
@@ -577,9 +571,10 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
 /** @defgroup FDCAN_frame_format FDCAN Frame Format
  * @{
  */
-#define FDCAN_FRAME_CLASSIC   ((uint32_t)0x00000000U)     /*!< Classic mode                      */
-#define FDCAN_FRAME_FD_NO_BRS ((uint32_t)FDCAN_CCCR_FDOE) /*!< FD mode without BitRate Switching \
-                                                           */
+#define FDCAN_FRAME_CLASSIC ((uint32_t)0x00000000U) /*!< Classic mode                      */
+#define FDCAN_FRAME_FD_NO_BRS                                          \
+    ((uint32_t)FDCAN_CCCR_FDOE) /*!< FD mode without BitRate Switching \
+                                 */
 #define FDCAN_FRAME_FD_BRS \
     ((uint32_t)(FDCAN_CCCR_FDOE | FDCAN_CCCR_BRSE)) /*!< FD mode with BitRate Switching    */
 /**
@@ -714,10 +709,10 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
 /** @defgroup FDCAN_filter_type FDCAN Filter Type
  * @{
  */
-#define FDCAN_FILTER_RANGE \
-    ((uint32_t)0x00000000U) /*!< Range filter from FilterID1 to FilterID2 */
-#define FDCAN_FILTER_DUAL \
-    ((uint32_t)0x00000001U) /*!< Dual ID filter for FilterID1 or FilterID2 */
+#define FDCAN_FILTER_RANGE ((uint32_t)0x00000000U) /*!< Range filter from FilterID1 to FilterID2 \
+                                                    */
+#define FDCAN_FILTER_DUAL ((uint32_t)0x00000001U)  /*!< Dual ID filter for FilterID1 or FilterID2 \
+                                                    */
 #define FDCAN_FILTER_MASK \
     ((uint32_t)0x00000002U) /*!< Classic filter: FilterID1 = filter, FilterID2 = mask */
 #define FDCAN_FILTER_RANGE_NO_EIDM                                                               \
@@ -872,49 +867,64 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
 #define FDCAN_TIMESTAMP_PRESC_1 \
     ((uint32_t)0x00000000U) /*!< Timestamp counter time unit in equal to CAN bit time */
 #define FDCAN_TIMESTAMP_PRESC_2 \
-    ((uint32_t)0x00010000U      \
+    (                           \
+        (uint32_t)0x00010000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 2  */
 #define FDCAN_TIMESTAMP_PRESC_3 \
-    ((uint32_t)0x00020000U      \
+    (                           \
+        (uint32_t)0x00020000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 3  */
 #define FDCAN_TIMESTAMP_PRESC_4 \
-    ((uint32_t)0x00030000U      \
+    (                           \
+        (uint32_t)0x00030000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 4  */
 #define FDCAN_TIMESTAMP_PRESC_5 \
-    ((uint32_t)0x00040000U      \
+    (                           \
+        (uint32_t)0x00040000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 5  */
 #define FDCAN_TIMESTAMP_PRESC_6 \
-    ((uint32_t)0x00050000U      \
+    (                           \
+        (uint32_t)0x00050000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 6  */
 #define FDCAN_TIMESTAMP_PRESC_7 \
-    ((uint32_t)0x00060000U      \
+    (                           \
+        (uint32_t)0x00060000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 7  */
 #define FDCAN_TIMESTAMP_PRESC_8 \
-    ((uint32_t)0x00070000U      \
+    (                           \
+        (uint32_t)0x00070000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 8  */
 #define FDCAN_TIMESTAMP_PRESC_9 \
-    ((uint32_t)0x00080000U      \
+    (                           \
+        (uint32_t)0x00080000U   \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 9  */
 #define FDCAN_TIMESTAMP_PRESC_10 \
-    ((uint32_t)0x00090000U       \
+    (                            \
+        (uint32_t)0x00090000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 10 */
 #define FDCAN_TIMESTAMP_PRESC_11 \
-    ((uint32_t)0x000A0000U       \
+    (                            \
+        (uint32_t)0x000A0000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 11 */
 #define FDCAN_TIMESTAMP_PRESC_12 \
-    ((uint32_t)0x000B0000U       \
+    (                            \
+        (uint32_t)0x000B0000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 12 */
 #define FDCAN_TIMESTAMP_PRESC_13 \
-    ((uint32_t)0x000C0000U       \
+    (                            \
+        (uint32_t)0x000C0000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 13 */
 #define FDCAN_TIMESTAMP_PRESC_14 \
-    ((uint32_t)0x000D0000U       \
+    (                            \
+        (uint32_t)0x000D0000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 14 */
 #define FDCAN_TIMESTAMP_PRESC_15 \
-    ((uint32_t)0x000E0000U       \
+    (                            \
+        (uint32_t)0x000E0000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 15 */
 #define FDCAN_TIMESTAMP_PRESC_16 \
-    ((uint32_t)0x000F0000U       \
+    (                            \
+        (uint32_t)0x000F0000U    \
     ) /*!< Timestamp counter time unit in equal to CAN bit time multiplied by 16 */
 /**
  * @}
@@ -1070,9 +1080,10 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
 #define FDCAN_IT_RAM_ACCESS_FAILURE \
     FDCAN_IE_MRAFE /*!< Message RAM access failure occurred              */
 #define FDCAN_IT_ERROR_LOGGING_OVERFLOW \
-    FDCAN_IE_ELOE                           /*!< Overflow of FDCAN Error Logging Counter occurred */
-#define FDCAN_IT_RAM_WATCHDOG FDCAN_IE_WDIE /*!< Message RAM Watchdog event due to missing READY \
-                                             */
+    FDCAN_IE_ELOE /*!< Overflow of FDCAN Error Logging Counter occurred */
+#define FDCAN_IT_RAM_WATCHDOG                                          \
+    FDCAN_IE_WDIE /*!< Message RAM Watchdog event due to missing READY \
+                   */
 #define FDCAN_IT_ARB_PROTOCOL_ERROR \
     FDCAN_IE_PEAE /*!< Protocol error in arbitration phase detected     */
 #define FDCAN_IT_DATA_PROTOCOL_ERROR \
@@ -1100,24 +1111,24 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
 /** @defgroup FDCAN_Interrupts_List FDCAN Interrupts List
  * @{
  */
-#define FDCAN_IT_LIST_RX_FIFO0                                                               \
-    (FDCAN_IT_RX_FIFO0_MESSAGE_LOST | FDCAN_IT_RX_FIFO0_FULL | FDCAN_IT_RX_FIFO0_NEW_MESSAGE \
-    ) /*!< RX FIFO 0 Interrupts List          */
-#define FDCAN_IT_LIST_RX_FIFO1                                                               \
-    (FDCAN_IT_RX_FIFO1_MESSAGE_LOST | FDCAN_IT_RX_FIFO1_FULL | FDCAN_IT_RX_FIFO1_NEW_MESSAGE \
-    ) /*!< RX FIFO 1 Interrupts List          */
-#define FDCAN_IT_LIST_SMSG                                                             \
-    (FDCAN_IT_TX_ABORT_COMPLETE | FDCAN_IT_TX_COMPLETE | FDCAN_IT_RX_HIGH_PRIORITY_MSG \
-    ) /*!< Status Message Interrupts List     */
+#define FDCAN_IT_LIST_RX_FIFO0                                 \
+    (FDCAN_IT_RX_FIFO0_MESSAGE_LOST | FDCAN_IT_RX_FIFO0_FULL | \
+     FDCAN_IT_RX_FIFO0_NEW_MESSAGE) /*!< RX FIFO 0 Interrupts List          */
+#define FDCAN_IT_LIST_RX_FIFO1                                 \
+    (FDCAN_IT_RX_FIFO1_MESSAGE_LOST | FDCAN_IT_RX_FIFO1_FULL | \
+     FDCAN_IT_RX_FIFO1_NEW_MESSAGE) /*!< RX FIFO 1 Interrupts List          */
+#define FDCAN_IT_LIST_SMSG                               \
+    (FDCAN_IT_TX_ABORT_COMPLETE | FDCAN_IT_TX_COMPLETE | \
+     FDCAN_IT_RX_HIGH_PRIORITY_MSG) /*!< Status Message Interrupts List     */
 #define FDCAN_IT_LIST_TX_FIFO_ERROR                                                              \
     (FDCAN_IT_TX_EVT_FIFO_ELT_LOST | FDCAN_IT_TX_EVT_FIFO_FULL | FDCAN_IT_TX_EVT_FIFO_NEW_DATA | \
      FDCAN_IT_TX_FIFO_EMPTY) /*!< TX FIFO Error Interrupts List      */
-#define FDCAN_IT_LIST_MISC                                                                   \
-    (FDCAN_IT_TIMEOUT_OCCURRED | FDCAN_IT_RAM_ACCESS_FAILURE | FDCAN_IT_TIMESTAMP_WRAPAROUND \
-    ) /*!< Misc. Interrupts List              */
-#define FDCAN_IT_LIST_BIT_LINE_ERROR                          \
-    (FDCAN_IT_ERROR_PASSIVE | FDCAN_IT_ERROR_LOGGING_OVERFLOW \
-    ) /*!< Bit and Line Error Interrupts List */
+#define FDCAN_IT_LIST_MISC                                     \
+    (FDCAN_IT_TIMEOUT_OCCURRED | FDCAN_IT_RAM_ACCESS_FAILURE | \
+     FDCAN_IT_TIMESTAMP_WRAPAROUND) /*!< Misc. Interrupts List              */
+#define FDCAN_IT_LIST_BIT_LINE_ERROR \
+    (FDCAN_IT_ERROR_PASSIVE |        \
+     FDCAN_IT_ERROR_LOGGING_OVERFLOW) /*!< Bit and Line Error Interrupts List */
 #define FDCAN_IT_LIST_PROTOCOL_ERROR                                          \
     (FDCAN_IT_RESERVED_ADDRESS_ACCESS | FDCAN_IT_DATA_PROTOCOL_ERROR |        \
      FDCAN_IT_ARB_PROTOCOL_ERROR | FDCAN_IT_RAM_WATCHDOG | FDCAN_IT_BUS_OFF | \
@@ -1274,47 +1285,47 @@ typedef void (*pFDCAN_ErrorStatusCallbackTypeDef)(
  * @{
  */
 /* Initialization and de-initialization functions *****************************/
-HAL_StatusTypeDef HAL_FDCAN_Init(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_DeInit(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_EnterPowerDownMode(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_ExitPowerDownMode(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_Init(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_DeInit(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_EnterPowerDownMode(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_ExitPowerDownMode(FDCAN_HandleTypeDef* hfdcan);
 
 #if USE_HAL_FDCAN_REGISTER_CALLBACKS == 1
 /* Callbacks Register/UnRegister functions  ***********************************/
 HAL_StatusTypeDef HAL_FDCAN_RegisterCallback(
-    FDCAN_HandleTypeDef *hfdcan,
+    FDCAN_HandleTypeDef* hfdcan,
     HAL_FDCAN_CallbackIDTypeDef CallbackID,
     pFDCAN_CallbackTypeDef pCallback
 );
 HAL_StatusTypeDef HAL_FDCAN_UnRegisterCallback(
-    FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID
+    FDCAN_HandleTypeDef* hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID
 );
 HAL_StatusTypeDef HAL_FDCAN_RegisterTxEventFifoCallback(
-    FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxEventFifoCallbackTypeDef pCallback
+    FDCAN_HandleTypeDef* hfdcan, pFDCAN_TxEventFifoCallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo0Callback(
-    FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo0CallbackTypeDef pCallback
+    FDCAN_HandleTypeDef* hfdcan, pFDCAN_RxFifo0CallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo0Callback(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo1Callback(
-    FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo1CallbackTypeDef pCallback
+    FDCAN_HandleTypeDef* hfdcan, pFDCAN_RxFifo1CallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo1Callback(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferCompleteCallback(
-    FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferCompleteCallbackTypeDef pCallback
+    FDCAN_HandleTypeDef* hfdcan, pFDCAN_TxBufferCompleteCallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferAbortCallback(
-    FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferAbortCallbackTypeDef pCallback
+    FDCAN_HandleTypeDef* hfdcan, pFDCAN_TxBufferAbortCallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferAbortCallback(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_RegisterErrorStatusCallback(
-    FDCAN_HandleTypeDef *hfdcan, pFDCAN_ErrorStatusCallbackTypeDef pCallback
+    FDCAN_HandleTypeDef* hfdcan, pFDCAN_ErrorStatusCallbackTypeDef pCallback
 );
-HAL_StatusTypeDef HAL_FDCAN_UnRegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_UnRegisterErrorStatusCallback(FDCAN_HandleTypeDef* hfdcan);
 #endif /* USE_HAL_FDCAN_REGISTER_CALLBACKS */
 /**
  * @}
@@ -1325,47 +1336,47 @@ HAL_StatusTypeDef HAL_FDCAN_UnRegisterErrorStatusCallback(FDCAN_HandleTypeDef *h
  */
 /* Configuration functions ****************************************************/
 HAL_StatusTypeDef HAL_FDCAN_ConfigFilter(
-    FDCAN_HandleTypeDef *hfdcan, const FDCAN_FilterTypeDef *sFilterConfig
+    FDCAN_HandleTypeDef* hfdcan, const FDCAN_FilterTypeDef* sFilterConfig
 );
 HAL_StatusTypeDef HAL_FDCAN_ConfigGlobalFilter(
-    FDCAN_HandleTypeDef *hfdcan,
+    FDCAN_HandleTypeDef* hfdcan,
     uint32_t NonMatchingStd,
     uint32_t NonMatchingExt,
     uint32_t RejectRemoteStd,
     uint32_t RejectRemoteExt
 );
-HAL_StatusTypeDef HAL_FDCAN_ConfigExtendedIdMask(FDCAN_HandleTypeDef *hfdcan, uint32_t Mask);
+HAL_StatusTypeDef HAL_FDCAN_ConfigExtendedIdMask(FDCAN_HandleTypeDef* hfdcan, uint32_t Mask);
 HAL_StatusTypeDef HAL_FDCAN_ConfigRxFifoOverwrite(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo, uint32_t OperationMode
+    FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo, uint32_t OperationMode
 );
 HAL_StatusTypeDef HAL_FDCAN_ConfigRamWatchdog(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t CounterStartValue
+    FDCAN_HandleTypeDef* hfdcan, uint32_t CounterStartValue
 );
 HAL_StatusTypeDef HAL_FDCAN_ConfigTimestampCounter(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t TimestampPrescaler
+    FDCAN_HandleTypeDef* hfdcan, uint32_t TimestampPrescaler
 );
 HAL_StatusTypeDef HAL_FDCAN_EnableTimestampCounter(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t TimestampOperation
+    FDCAN_HandleTypeDef* hfdcan, uint32_t TimestampOperation
 );
-HAL_StatusTypeDef HAL_FDCAN_DisableTimestampCounter(FDCAN_HandleTypeDef *hfdcan);
-uint16_t HAL_FDCAN_GetTimestampCounter(const FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_ResetTimestampCounter(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_DisableTimestampCounter(FDCAN_HandleTypeDef* hfdcan);
+uint16_t HAL_FDCAN_GetTimestampCounter(const FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_ResetTimestampCounter(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_ConfigTimeoutCounter(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t TimeoutOperation, uint32_t TimeoutPeriod
+    FDCAN_HandleTypeDef* hfdcan, uint32_t TimeoutOperation, uint32_t TimeoutPeriod
 );
-HAL_StatusTypeDef HAL_FDCAN_EnableTimeoutCounter(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_DisableTimeoutCounter(FDCAN_HandleTypeDef *hfdcan);
-uint16_t HAL_FDCAN_GetTimeoutCounter(const FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_ResetTimeoutCounter(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_EnableTimeoutCounter(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_DisableTimeoutCounter(FDCAN_HandleTypeDef* hfdcan);
+uint16_t HAL_FDCAN_GetTimeoutCounter(const FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_ResetTimeoutCounter(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_ConfigTxDelayCompensation(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t TdcOffset, uint32_t TdcFilter
+    FDCAN_HandleTypeDef* hfdcan, uint32_t TdcOffset, uint32_t TdcFilter
 );
-HAL_StatusTypeDef HAL_FDCAN_EnableTxDelayCompensation(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_DisableTxDelayCompensation(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_EnableISOMode(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_DisableISOMode(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_EnableEdgeFiltering(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_DisableEdgeFiltering(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_EnableTxDelayCompensation(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_DisableTxDelayCompensation(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_EnableISOMode(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_DisableISOMode(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_EnableEdgeFiltering(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_DisableEdgeFiltering(FDCAN_HandleTypeDef* hfdcan);
 /**
  * @}
  */
@@ -1374,38 +1385,38 @@ HAL_StatusTypeDef HAL_FDCAN_DisableEdgeFiltering(FDCAN_HandleTypeDef *hfdcan);
  * @{
  */
 /* Control functions **********************************************************/
-HAL_StatusTypeDef HAL_FDCAN_Start(FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_Stop(FDCAN_HandleTypeDef *hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_Start(FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_Stop(FDCAN_HandleTypeDef* hfdcan);
 HAL_StatusTypeDef HAL_FDCAN_AddMessageToTxFifoQ(
-    FDCAN_HandleTypeDef *hfdcan, const FDCAN_TxHeaderTypeDef *pTxHeader, const uint8_t *pTxData
+    FDCAN_HandleTypeDef* hfdcan, const FDCAN_TxHeaderTypeDef* pTxHeader, const uint8_t* pTxData
 );
-uint32_t HAL_FDCAN_GetLatestTxFifoQRequestBuffer(const FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_AbortTxRequest(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndex);
+uint32_t HAL_FDCAN_GetLatestTxFifoQRequestBuffer(const FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_AbortTxRequest(FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndex);
 HAL_StatusTypeDef HAL_FDCAN_GetRxMessage(
-    FDCAN_HandleTypeDef *hfdcan,
+    FDCAN_HandleTypeDef* hfdcan,
     uint32_t RxLocation,
-    FDCAN_RxHeaderTypeDef *pRxHeader,
-    uint8_t *pRxData
+    FDCAN_RxHeaderTypeDef* pRxHeader,
+    uint8_t* pRxData
 );
 HAL_StatusTypeDef HAL_FDCAN_GetTxEvent(
-    FDCAN_HandleTypeDef *hfdcan, FDCAN_TxEventFifoTypeDef *pTxEvent
+    FDCAN_HandleTypeDef* hfdcan, FDCAN_TxEventFifoTypeDef* pTxEvent
 );
 HAL_StatusTypeDef HAL_FDCAN_GetHighPriorityMessageStatus(
-    const FDCAN_HandleTypeDef *hfdcan, FDCAN_HpMsgStatusTypeDef *HpMsgStatus
+    const FDCAN_HandleTypeDef* hfdcan, FDCAN_HpMsgStatusTypeDef* HpMsgStatus
 );
 HAL_StatusTypeDef HAL_FDCAN_GetProtocolStatus(
-    const FDCAN_HandleTypeDef *hfdcan, FDCAN_ProtocolStatusTypeDef *ProtocolStatus
+    const FDCAN_HandleTypeDef* hfdcan, FDCAN_ProtocolStatusTypeDef* ProtocolStatus
 );
 HAL_StatusTypeDef HAL_FDCAN_GetErrorCounters(
-    const FDCAN_HandleTypeDef *hfdcan, FDCAN_ErrorCountersTypeDef *ErrorCounters
+    const FDCAN_HandleTypeDef* hfdcan, FDCAN_ErrorCountersTypeDef* ErrorCounters
 );
 uint32_t HAL_FDCAN_IsTxBufferMessagePending(
-    const FDCAN_HandleTypeDef *hfdcan, uint32_t TxBufferIndex
+    const FDCAN_HandleTypeDef* hfdcan, uint32_t TxBufferIndex
 );
-uint32_t HAL_FDCAN_GetRxFifoFillLevel(const FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo);
-uint32_t HAL_FDCAN_GetTxFifoFreeLevel(const FDCAN_HandleTypeDef *hfdcan);
-uint32_t HAL_FDCAN_IsRestrictedOperationMode(const FDCAN_HandleTypeDef *hfdcan);
-HAL_StatusTypeDef HAL_FDCAN_ExitRestrictedOperationMode(FDCAN_HandleTypeDef *hfdcan);
+uint32_t HAL_FDCAN_GetRxFifoFillLevel(const FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo);
+uint32_t HAL_FDCAN_GetTxFifoFreeLevel(const FDCAN_HandleTypeDef* hfdcan);
+uint32_t HAL_FDCAN_IsRestrictedOperationMode(const FDCAN_HandleTypeDef* hfdcan);
+HAL_StatusTypeDef HAL_FDCAN_ExitRestrictedOperationMode(FDCAN_HandleTypeDef* hfdcan);
 /**
  * @}
  */
@@ -1415,15 +1426,15 @@ HAL_StatusTypeDef HAL_FDCAN_ExitRestrictedOperationMode(FDCAN_HandleTypeDef *hfd
  */
 /* Interrupts management ******************************************************/
 HAL_StatusTypeDef HAL_FDCAN_ConfigInterruptLines(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t ITList, uint32_t InterruptLine
+    FDCAN_HandleTypeDef* hfdcan, uint32_t ITList, uint32_t InterruptLine
 );
 HAL_StatusTypeDef HAL_FDCAN_ActivateNotification(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t ActiveITs, uint32_t BufferIndexes
+    FDCAN_HandleTypeDef* hfdcan, uint32_t ActiveITs, uint32_t BufferIndexes
 );
 HAL_StatusTypeDef HAL_FDCAN_DeactivateNotification(
-    FDCAN_HandleTypeDef *hfdcan, uint32_t InactiveITs
+    FDCAN_HandleTypeDef* hfdcan, uint32_t InactiveITs
 );
-void HAL_FDCAN_IRQHandler(FDCAN_HandleTypeDef *hfdcan);
+void HAL_FDCAN_IRQHandler(FDCAN_HandleTypeDef* hfdcan);
 /**
  * @}
  */
@@ -1432,17 +1443,17 @@ void HAL_FDCAN_IRQHandler(FDCAN_HandleTypeDef *hfdcan);
  * @{
  */
 /* Callback functions *********************************************************/
-void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t TxEventFifoITs);
-void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs);
-void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs);
-void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);
-void HAL_FDCAN_TxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);
-void HAL_FDCAN_HighPriorityMessageCallback(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_TimestampWraparoundCallback(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan);
-void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs);
+void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t TxEventFifoITs);
+void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs);
+void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo1ITs);
+void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndexes);
+void HAL_FDCAN_TxBufferAbortCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t BufferIndexes);
+void HAL_FDCAN_HighPriorityMessageCallback(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_TimestampWraparoundCallback(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef* hfdcan);
+void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef* hfdcan, uint32_t ErrorStatusITs);
 /**
  * @}
  */
@@ -1451,8 +1462,8 @@ void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorSt
  * @{
  */
 /* Peripheral State functions *************************************************/
-uint32_t HAL_FDCAN_GetError(const FDCAN_HandleTypeDef *hfdcan);
-HAL_FDCAN_StateTypeDef HAL_FDCAN_GetState(const FDCAN_HandleTypeDef *hfdcan);
+uint32_t HAL_FDCAN_GetError(const FDCAN_HandleTypeDef* hfdcan);
+HAL_FDCAN_StateTypeDef HAL_FDCAN_GetState(const FDCAN_HandleTypeDef* hfdcan);
 /**
  * @}
  */

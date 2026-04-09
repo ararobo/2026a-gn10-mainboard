@@ -352,8 +352,9 @@ typedef struct {
 /** @defgroup FLASH_OB_USER_IWDG_STOP FLASH Option Bytes User IWDG Mode On Stop
  * @{
  */
-#define OB_IWDG_STOP_FREEZE 0x00000000U /*!< Independent watchdog counter is frozen in Stop mode \
-                                         */
+#define OB_IWDG_STOP_FREEZE                                              \
+    0x00000000U /*!< Independent watchdog counter is frozen in Stop mode \
+                 */
 #define OB_IWDG_STOP_RUN \
     FLASH_OPTR_IWDG_STOP /*!< Independent watchdog counter is running in Stop mode */
 /**
@@ -463,9 +464,10 @@ typedef struct {
 /** @defgroup FLASH_OB_USER_NRST_MODE FLASH Option Bytes User NRST mode bit
  * @{
  */
-#define OB_NRST_MODE_INPUT_ONLY FLASH_OPTR_NRST_MODE_0 /*!< Reset pin is in Reset input mode only \
-                                                        */
-#define OB_NRST_MODE_GPIO FLASH_OPTR_NRST_MODE_1       /*!< Reset pin is in GPIO mode only */
+#define OB_NRST_MODE_INPUT_ONLY                                                             \
+    FLASH_OPTR_NRST_MODE_0                       /*!< Reset pin is in Reset input mode only \
+                                                  */
+#define OB_NRST_MODE_GPIO FLASH_OPTR_NRST_MODE_1 /*!< Reset pin is in GPIO mode only */
 #define OB_NRST_MODE_INPUT_OUTPUT \
     FLASH_OPTR_NRST_MODE /*!< Reset pin is in reset input and output mode */
 /**
@@ -934,19 +936,19 @@ HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout);
 #define FLASH_SIZE_DATA_REGISTER FLASHSIZE_BASE
 
 #if defined(FLASH_OPTR_DBANK)
-#define FLASH_SIZE                                            \
-    ((((*((uint16_t *)FLASH_SIZE_DATA_REGISTER)) == 0xFFFFU)) \
-         ? (0x200UL << 10U)                                   \
-         : (((*((uint32_t *)FLASH_SIZE_DATA_REGISTER)) & 0xFFFFUL) << 10U))
+#define FLASH_SIZE                                           \
+    ((((*((uint16_t*)FLASH_SIZE_DATA_REGISTER)) == 0xFFFFU)) \
+         ? (0x200UL << 10U)                                  \
+         : (((*((uint32_t*)FLASH_SIZE_DATA_REGISTER)) & 0xFFFFUL) << 10U))
 #define FLASH_BANK_SIZE (FLASH_SIZE >> 1)
 #define FLASH_PAGE_NB \
     ((FLASH_SIZE == 0x00080000U) ? 128U : ((FLASH_SIZE == 0x00040000U) ? 64U : 32U))
 #define FLASH_PAGE_SIZE_128_BITS 0x1000U /* 4 KB */
 #else
-#define FLASH_SIZE                                            \
-    ((((*((uint16_t *)FLASH_SIZE_DATA_REGISTER)) == 0xFFFFU)) \
-         ? (0x80UL << 10U)                                    \
-         : (((*((uint32_t *)FLASH_SIZE_DATA_REGISTER)) & 0xFFFFUL) << 10U))
+#define FLASH_SIZE                                           \
+    ((((*((uint16_t*)FLASH_SIZE_DATA_REGISTER)) == 0xFFFFU)) \
+         ? (0x80UL << 10U)                                   \
+         : (((*((uint32_t*)FLASH_SIZE_DATA_REGISTER)) & 0xFFFFUL) << 10U))
 #define FLASH_BANK_SIZE (FLASH_SIZE)
 #define FLASH_PAGE_NB \
     ((FLASH_SIZE == 0x00080000U) ? 256U : ((FLASH_SIZE == 0x00040000U) ? 128U : 64U))

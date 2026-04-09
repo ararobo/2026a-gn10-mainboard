@@ -736,8 +736,7 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
         }
     }
     /* Transfer Complete Interrupt management ***********************************/
-    else if ((0U != (flag_it & ((uint32_t)DMA_FLAG_TC1 << (hdma->ChannelIndex & 0x1FU)))) &&
-             (0U != (source_it & DMA_IT_TC))) {
+    else if ((0U != (flag_it & ((uint32_t)DMA_FLAG_TC1 << (hdma->ChannelIndex & 0x1FU)))) && (0U != (source_it & DMA_IT_TC))) {
         if ((hdma->Instance->CCR & DMA_CCR_CIRC) == 0U) {
             /* Disable the transfer complete and error interrupt */
             __HAL_DMA_DISABLE_IT(hdma, DMA_IT_TE | DMA_IT_TC);
@@ -757,8 +756,7 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
         }
     }
     /* Transfer Error Interrupt management **************************************/
-    else if ((0U != (flag_it & ((uint32_t)DMA_FLAG_TE1 << (hdma->ChannelIndex & 0x1FU)))) &&
-             (0U != (source_it & DMA_IT_TE))) {
+    else if ((0U != (flag_it & ((uint32_t)DMA_FLAG_TE1 << (hdma->ChannelIndex & 0x1FU)))) && (0U != (source_it & DMA_IT_TE))) {
         /* When a DMA transfer error occurs */
         /* A hardware clear of its EN bits is performed */
         /* Disable ALL DMA IT */
@@ -1029,11 +1027,10 @@ static void DMA_CalcDMAMUXChannelBaseAndMask(DMA_HandleTypeDef *hdma)
 #endif /* STM32G4x1xx) */
     }
 
-    dmamux_base_addr = (uint32_t)DMAMUX1_ChannelBase;
-    hdma->DMAmuxChannel =
-        (DMAMUX_Channel_TypeDef *)(uint32_t)(dmamux_base_addr + ((hdma->ChannelIndex >> 2U) *
-                                                                 ((uint32_t)DMAMUX1_Channel1 -
-                                                                  (uint32_t)DMAMUX1_Channel0)));
+    dmamux_base_addr              = (uint32_t)DMAMUX1_ChannelBase;
+    hdma->DMAmuxChannel           = (DMAMUX_Channel_TypeDef *)(uint32_t
+    )(dmamux_base_addr +
+      ((hdma->ChannelIndex >> 2U) * ((uint32_t)DMAMUX1_Channel1 - (uint32_t)DMAMUX1_Channel0)));
     hdma->DMAmuxChannelStatus     = DMAMUX1_ChannelStatus;
     hdma->DMAmuxChannelStatusMask = 1UL << (channel_number & 0x1FU);
 }
@@ -1050,9 +1047,8 @@ static void DMA_CalcDMAMUXRequestGenBaseAndMask(DMA_HandleTypeDef *hdma)
     uint32_t request = hdma->Init.Request & DMAMUX_CxCR_DMAREQ_ID;
 
     /* DMA Channels are connected to DMAMUX1 request generator blocks*/
-    hdma->DMAmuxRequestGen =
-        (DMAMUX_RequestGen_TypeDef *)((uint32_t)(((uint32_t)DMAMUX1_RequestGenerator0) +
-                                                 ((request - 1U) * 4U)));
+    hdma->DMAmuxRequestGen = (DMAMUX_RequestGen_TypeDef *)((uint32_t
+    )(((uint32_t)DMAMUX1_RequestGenerator0) + ((request - 1U) * 4U)));
 
     hdma->DMAmuxRequestGenStatus = DMAMUX1_RequestGenStatus;
 

@@ -60,8 +60,7 @@ static const uint16_t LPUART_PRESCALER_TAB[] = {
     (uint16_t)256,
     (uint16_t)256,
     (uint16_t)256,
-    (uint16_t)256
-};
+    (uint16_t)256};
 /**
  * @}
  */
@@ -500,15 +499,14 @@ typedef struct {
  * @param  __BAUDRATE__ Baud Rate value to achieve
  * @retval LPUARTDIV value to be used for BRR register filling
  */
-#define __LL_LPUART_DIV(__PERIPHCLK__, __PRESCALER__, __BAUDRATE__)        \
-    (uint32_t)(                                                            \
-        (((((uint64_t)(__PERIPHCLK__) /                                    \
-            (uint64_t)(LPUART_PRESCALER_TAB[(uint16_t)(__PRESCALER__)])) * \
-           LPUART_LPUARTDIV_FREQ_MUL) +                                    \
-          (uint32_t)((__BAUDRATE__) / 2U)) /                               \
-         (__BAUDRATE__)) &                                                 \
-        LPUART_BRR_MASK                                                    \
-    )
+#define __LL_LPUART_DIV(__PERIPHCLK__, __PRESCALER__, __BAUDRATE__)                               \
+    (uint32_t                                                                                     \
+    )((((((uint64_t)(__PERIPHCLK__) / (uint64_t)(LPUART_PRESCALER_TAB[(uint16_t)(__PRESCALER__)]) \
+         ) *                                                                                      \
+         LPUART_LPUARTDIV_FREQ_MUL) +                                                             \
+        (uint32_t)((__BAUDRATE__) / 2U)) /                                                        \
+       (__BAUDRATE__)) &                                                                          \
+      LPUART_BRR_MASK)
 
 /**
  * @}

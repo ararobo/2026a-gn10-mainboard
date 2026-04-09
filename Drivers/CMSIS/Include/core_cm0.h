@@ -520,7 +520,7 @@ typedef struct {
   \param[in] value  Value of register. This parameter is interpreted as an uint32_t type.
   \return           Masked and shifted bit field value.
 */
-#define _FLD2VAL(field, value) (((uint32_t)(value) & field##_Msk) >> field##_Pos)
+#define _FLD2VAL(field, value) (((uint32_t)(value)&field##_Msk) >> field##_Pos)
 
 /*@} end of group CMSIS_core_bitfield */
 
@@ -637,8 +637,8 @@ __STATIC_INLINE void __NVIC_EnableIRQ(IRQn_Type IRQn)
 __STATIC_INLINE uint32_t __NVIC_GetEnableIRQ(IRQn_Type IRQn)
 {
     if ((int32_t)(IRQn) >= 0) {
-        return ((uint32_t)(((NVIC->ISER[0U] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
-                                                                                            : 0UL));
+        return ((uint32_t
+        )(((NVIC->ISER[0U] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
     } else {
         return (0U);
     }
@@ -669,8 +669,8 @@ __STATIC_INLINE void __NVIC_DisableIRQ(IRQn_Type IRQn)
 __STATIC_INLINE uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn)
 {
     if ((int32_t)(IRQn) >= 0) {
-        return ((uint32_t)(((NVIC->ISPR[0U] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL
-                                                                                            : 0UL));
+        return ((uint32_t
+        )(((NVIC->ISPR[0U] & (1UL << (((uint32_t)IRQn) & 0x1FUL))) != 0UL) ? 1UL : 0UL));
     } else {
         return (0U);
     }
@@ -737,11 +737,13 @@ __STATIC_INLINE void __NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 __STATIC_INLINE uint32_t __NVIC_GetPriority(IRQn_Type IRQn)
 {
     if ((int32_t)(IRQn) >= 0) {
-        return ((uint32_t)(((NVIC->IP[_IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >>
-                           (8U - __NVIC_PRIO_BITS)));
+        return ((uint32_t
+        )(((NVIC->IP[_IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >>
+          (8U - __NVIC_PRIO_BITS)));
     } else {
-        return ((uint32_t)(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >>
-                           (8U - __NVIC_PRIO_BITS)));
+        return ((uint32_t
+        )(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn)) & (uint32_t)0xFFUL) >>
+          (8U - __NVIC_PRIO_BITS)));
     }
 }
 

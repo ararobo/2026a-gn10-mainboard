@@ -547,7 +547,7 @@ typedef struct {
  */
 #define RCC_CRS_HSI48CALIBRATION_DEFAULT                                                      \
     0x00000040U /*!< The default value is 64, which corresponds to the middle of the trimming \
-                   interval. The trimming step is around 67 kHz between two consecutive TRIM                              \
+                   interval. The trimming step is around 67 kHz between two consecutive TRIM  \
                    steps. A higher TRIM value corresponds to a higher output frequency */
 /**
  * @}
@@ -1293,8 +1293,8 @@ typedef struct {
  * @{
  */
 
-HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef const *PeriphClkInit);
-void HAL_RCCEx_GetPeriphCLKConfig(RCC_PeriphCLKInitTypeDef *PeriphClkInit);
+HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef const* PeriphClkInit);
+void HAL_RCCEx_GetPeriphCLKConfig(RCC_PeriphCLKInitTypeDef* PeriphClkInit);
 uint32_t HAL_RCCEx_GetPeriphCLKFreq(uint32_t PeriphClk);
 
 /**
@@ -1321,9 +1321,9 @@ void HAL_RCCEx_DisableLSCO(void);
  * @{
  */
 
-void HAL_RCCEx_CRSConfig(RCC_CRSInitTypeDef const *pInit);
+void HAL_RCCEx_CRSConfig(RCC_CRSInitTypeDef const* pInit);
 void HAL_RCCEx_CRSSoftwareSynchronizationGenerate(void);
-void HAL_RCCEx_CRSGetSynchronizationInfo(RCC_CRSSynchroInfoTypeDef *pSynchroInfo);
+void HAL_RCCEx_CRSGetSynchronizationInfo(RCC_CRSSynchroInfoTypeDef* pSynchroInfo);
 uint32_t HAL_RCCEx_CRSWaitSynchronization(uint32_t Timeout);
 void HAL_RCCEx_CRS_IRQHandler(void);
 void HAL_RCCEx_CRS_SyncOkCallback(void);

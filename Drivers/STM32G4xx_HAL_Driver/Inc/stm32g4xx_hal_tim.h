@@ -2156,9 +2156,10 @@ mode.
  */
 /* The counter of a timer instance is disabled only if all the CCx and CCxN
    channels have been disabled */
-#define TIM_CCER_CCxE_MASK                                                                      \
-    ((uint32_t)(TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E | TIM_CCER_CC5E | \
-                TIM_CCER_CC6E))
+#define TIM_CCER_CCxE_MASK                                                            \
+    ((uint32_t                                                                        \
+    )(TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E | TIM_CCER_CC5E | \
+      TIM_CCER_CC6E))
 #define TIM_CCER_CCxNE_MASK \
     ((uint32_t)(TIM_CCER_CC1NE | TIM_CCER_CC2NE | TIM_CCER_CC3NE | TIM_CCER_CC4NE))
 /**
@@ -2201,7 +2202,7 @@ mode.
      ((__BASE__) == TIM_DMABASE_OR))
 
 #define IS_TIM_EVENT_SOURCE(__SOURCE__) \
-    ((((__SOURCE__) & 0xFFFFFE00U) == 0x00000000U) && ((__SOURCE__) != 0x00000000U))
+    ((((__SOURCE__)&0xFFFFFE00U) == 0x00000000U) && ((__SOURCE__) != 0x00000000U))
 
 #define IS_TIM_COUNTER_MODE(__MODE__)                                              \
     (((__MODE__) == TIM_COUNTERMODE_UP) || ((__MODE__) == TIM_COUNTERMODE_DOWN) || \
@@ -2267,7 +2268,7 @@ mode.
      ((__MODE__) == TIM_ENCODERMODE_X1_TI1) || ((__MODE__) == TIM_ENCODERMODE_X1_TI2))
 
 #define IS_TIM_DMA_SOURCE(__SOURCE__) \
-    ((((__SOURCE__) & 0xFFFF80FFU) == 0x00000000U) && ((__SOURCE__) != 0x00000000U))
+    ((((__SOURCE__)&0xFFFF80FFU) == 0x00000000U) && ((__SOURCE__) != 0x00000000U))
 
 #define IS_TIM_CHANNELS(__CHANNEL__)                                         \
     (((__CHANNEL__) == TIM_CHANNEL_1) || ((__CHANNEL__) == TIM_CHANNEL_2) || \
@@ -2391,7 +2392,7 @@ mode.
 #define IS_TIM_AUTOMATIC_OUTPUT_STATE(__STATE__) \
     (((__STATE__) == TIM_AUTOMATICOUTPUT_ENABLE) || ((__STATE__) == TIM_AUTOMATICOUTPUT_DISABLE))
 
-#define IS_TIM_GROUPCH5(__OCREF__) ((((__OCREF__) & 0x1FFFFFFFU) == 0x00000000U))
+#define IS_TIM_GROUPCH5(__OCREF__) ((((__OCREF__)&0x1FFFFFFFU) == 0x00000000U))
 
 #define IS_TIM_TRGO_SOURCE(__SOURCE__)                                         \
     (((__SOURCE__) == TIM_TRGO_RESET) || ((__SOURCE__) == TIM_TRGO_ENABLE) ||  \

@@ -81,13 +81,13 @@
 /** @defgroup RCC_Private_Macros RCC Private Macros
  * @{
  */
-#define RCC_GET_MCO_GPIO_PIN(__RCC_MCOx__) ((__RCC_MCOx__) & GPIO_PIN_MASK)
+#define RCC_GET_MCO_GPIO_PIN(__RCC_MCOx__) ((__RCC_MCOx__)&GPIO_PIN_MASK)
 
 #define RCC_GET_MCO_GPIO_AF(__RCC_MCOx__) \
-    (((__RCC_MCOx__) & RCC_MCO_GPIOAF_MASK) >> RCC_MCO_GPIOAF_POS)
+    (((__RCC_MCOx__)&RCC_MCO_GPIOAF_MASK) >> RCC_MCO_GPIOAF_POS)
 
 #define RCC_GET_MCO_GPIO_INDEX(__RCC_MCOx__) \
-    (((__RCC_MCOx__) & RCC_MCO_GPIOPORT_MASK) >> RCC_MCO_GPIOPORT_POS)
+    (((__RCC_MCOx__)&RCC_MCO_GPIOPORT_MASK) >> RCC_MCO_GPIOPORT_POS)
 
 #define RCC_GET_MCO_GPIO_PORT(__RCC_MCOx__) \
     (AHB2PERIPH_BASE + ((0x00000400UL) * RCC_GET_MCO_GPIO_INDEX(__RCC_MCOx__)))
