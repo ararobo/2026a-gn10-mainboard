@@ -28,6 +28,7 @@ void update_heartbeat_led()
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
 gn10_can::CANBus can1_bus(can1_driver);
 gn10_can::devices::MotorDriverClient motor1(can1_bus, 0);
+gn10_can::devices::MotorDriverClient motor2(can1_bus, 1);
 
 gn10_can::devices::MotorConfig motor1_config;
 
@@ -44,6 +45,7 @@ void setup()
     motor1_config.set_accel_ratio(1.0f);
     motor1_config.set_max_duty_ratio(1.0f);
     motor1.set_init(motor1_config);
+    motor2.set_init(motor1_config);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
@@ -67,6 +69,7 @@ void loop()
     }
 
     motor1.set_target(output);
+    motor2.set_target(output);
     update_heartbeat_led();
     HAL_Delay(10);
 }
