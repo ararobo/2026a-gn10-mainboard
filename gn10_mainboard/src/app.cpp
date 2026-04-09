@@ -29,12 +29,7 @@ void update_heartbeat_led()
 }  // namespace
 
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
-gn10_can::CANBus can1_bus(can1_driver);
-gn10_can::devices::MotorDriverClient wheel_front(can1_bus, 0);
-gn10_can::devices::MotorDriverClient wheel_back_l(can1_bus, 1);
-gn10_can::devices::MotorDriverClient wheel_back_r(can1_bus, 2);
-
-gn10_can::devices::MotorConfig wheel_config;
+robomas_can::C620CAN wheel_esc(can1_driver);
 
 RobotEthernet ethernet;
 ThreeWheelOmni omni(0.2f, 0.06f);
@@ -51,11 +46,6 @@ void setup()
 {
     can1_driver.init();
     ethernet.init();
-    wheel_config.set_accel_ratio(1.0f);
-    wheel_config.set_max_duty_ratio(1.0f);
-    wheel_front.set_init(wheel_config);
-    wheel_back_l.set_init(wheel_config);
-    wheel_back_r.set_init(wheel_config);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
@@ -72,9 +62,13 @@ void loop()
         &wheel_angular_velocity_back_l,
         &wheel_angular_velocity_back_r
     );
-    wheel_front.set_target(wheel_angular_velocity_front);
-    wheel_back_l.set_target(wheel_angular_velocity_back_l);
-    wheel_back_r.set_target(wheel_angular_velocity_back_r);
+    wheel_esc.set_current_can1(
+        wheel_angular_velocity_front,
+        wheel_angular_velocity_back_l,
+        wheel_angular_velocity_back_r,
+        0.0f
+    );
+
     update_heartbeat_led();
     // robomas用の
     HAL_Delay(10);
