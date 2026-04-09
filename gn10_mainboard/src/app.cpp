@@ -28,8 +28,10 @@ void update_heartbeat_led()
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
 gn10_can::CANBus can1_bus(can1_driver);
 gn10_can::devices::MotorDriverClient motor1(can1_bus, 0);
-
 gn10_can::devices::MotorConfig motor1_config;
+
+gn10_can::drivers::DriverSTM32FDCAN can2_driver(&hfdcan2);
+gn10_can::CANBus can2_bus(can2_driver);
 
 float output = 0.0f;
 float accel  = 0.001f;
@@ -41,6 +43,7 @@ bool sign    = true;
 void setup()
 {
     can1_driver.init();
+    can2_driver.init();
     motor1_config.set_accel_ratio(1.0f);
     motor1_config.set_max_duty_ratio(1.0f);
     motor1.set_init(motor1_config);
@@ -68,6 +71,7 @@ void loop()
 
     motor1.set_target(output);
     update_heartbeat_led();
+    // robomas用の
     HAL_Delay(10);
 }
 extern "C" {
