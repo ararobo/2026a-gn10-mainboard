@@ -1,5 +1,5 @@
 #pragma once
-#include "gn10_can/core/can_bus.hpp"
+#include "gn10_can/drivers/driver_interface.hpp"
 
 namespace robomas_can {
 
@@ -27,8 +27,7 @@ struct motor_type {
 class RobomasData
 {
 private:
-    gn10_can::CANBus& bus_;
-    gn10_can::CANFrame frame_;
+    gn10_can::drivers::ICanDriver& can_driver_;
     MotorCurrent motor_current_[2];
     float current_conversion_[8];
 
@@ -44,7 +43,7 @@ public:
      *
      * @param current_conversion 電流変換定数
      */
-    RobomasData(gn10_can::CANBus& bus);
+    RobomasData(gn10_can::drivers::ICanDriver& can_driver);
 
     virtual ~RobomasData() = default;
 
