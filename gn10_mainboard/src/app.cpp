@@ -4,6 +4,7 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
+#include "wiznet_ether/robot_ethernet.hpp"
 
 namespace {
 
@@ -32,6 +33,8 @@ gn10_can::devices::MotorDriverClient motor2(can1_bus, 1);
 
 gn10_can::devices::MotorConfig motor1_config;
 
+RobotEthernet ethernet;
+
 float output = 0.0f;
 float accel  = 0.001f;
 bool sign    = true;
@@ -42,6 +45,7 @@ bool sign    = true;
 void setup()
 {
     can1_driver.init();
+    ethernet.init();
     motor1_config.set_accel_ratio(1.0f);
     motor1_config.set_max_duty_ratio(1.0f);
     motor1.set_init(motor1_config);
