@@ -5,6 +5,7 @@
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_mainboard/four_wheel_omni.hpp"
+#include "gn10_mainboard/pid.hpp"
 #include "robomas_can/c620_can.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
 
@@ -34,11 +35,26 @@ robomas_can::C620CAN wheel_esc(can1_driver);
 RobotEthernet ethernet;
 FourWheelOmni omni(0.2f, 0.06f);
 
+gn10_motor::PIDConfig<float> pid_config_wheel_fr;
+gn10_motor::PIDConfig<float> pid_config_wheel_fl;
+gn10_motor::PIDConfig<float> pid_config_wheel_bl;
+gn10_motor::PIDConfig<float> pid_config_wheel_br;
+
+gn10_motor::PID<float> pid_wheel_fr(pid_config_wheel_fr);
+gn10_motor::PID<float> pid_wheel_fl(pid_config_wheel_fl);
+gn10_motor::PID<float> pid_wheel_bl(pid_config_wheel_bl);
+gn10_motor::PID<float> pid_wheel_br(pid_config_wheel_br);
+
 operation_data_t operation;
-float wheel_angular_velocity_fr = 0;
-float wheel_angular_velocity_fl = 0;
-float wheel_angular_velocity_bl = 0;
-float wheel_angular_velocity_br = 0;
+float wheel_angular_velocity_fr = 0.0f;
+float wheel_angular_velocity_fl = 0.0f;
+float wheel_angular_velocity_bl = 0.0f;
+float wheel_angular_velocity_br = 0.0f;
+
+float wheel_angular_velocity_fr_feedback = 0.0f;
+float wheel_angular_velocity_fl_feedback = 0.0f;
+float wheel_angular_velocity_bl_feedback = 0.0f;
+float wheel_angular_velocity_br_feedback = 0.0f;
 
 /**
  * @brief Initialize CAN and mainboard application state.
@@ -47,6 +63,23 @@ void setup()
 {
     can1_driver.init();
     ethernet.init();
+
+    pid_config_wheel_fr.kp = 0.1f;
+    pid_config_wheel_fr.ki = 0.0f;
+    pid_config_wheel_fr.kd = 0.0f;
+    pid_wheel_fr.update_config(pid_config_wheel_fr);
+    pid_config_wheel_fl.kp = 0.1f;
+    pid_config_wheel_fl.ki = 0.0f;
+    pid_config_wheel_fl.kd = 0.0f;
+    pid_wheel_fl.update_config(pid_config_wheel_fl);
+    pid_config_wheel_bl.kp = 0.1f;
+    pid_config_wheel_bl.ki = 0.0f;
+    pid_config_wheel_bl.kd = 0.0f;
+    pid_wheel_bl.update_config(pid_config_wheel_bl);
+    pid_config_wheel_br.kp = 0.1f;
+    pid_config_wheel_br.ki = 0.0f;
+    pid_config_wheel_br.kd = 0.0f;
+    pid_wheel_br.update_config(pid_config_wheel_br);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
@@ -64,7 +97,24 @@ void loop()
         &wheel_angular_velocity_bl,
         &wheel_angular_velocity_br
     );
+    wheel_angular_velocity_fr_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(0) / 60.0f;
+    wheel_angular_velocity_fl_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(1) / 60.0f;
+    wheel_angular_velocity_bl_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(2) / 60.0f;
+    wheel_angular_velocity_br_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(3) / 60.0f;
+
     float wheel_currents[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    wheel_currents[0] =
+        pid_wheel_fr.update(wheel_angular_velocity_fr, wheel_angular_velocity_fr_feedback, 0.01f);
+    wheel_currents[1] =
+        pid_wheel_fl.update(wheel_angular_velocity_fl, wheel_angular_velocity_fl_feedback, 0.01f);
+    wheel_currents[2] =
+        pid_wheel_bl.update(wheel_angular_velocity_bl, wheel_angular_velocity_bl_feedback, 0.01f);
+    wheel_currents[3] =
+        pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.01f);
 
     wheel_esc.set_current_can1(
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
