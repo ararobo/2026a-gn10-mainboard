@@ -1,9 +1,11 @@
-#include "robomas_can/robomas_can.hpp"
+#include "robomas_can/robomas_data.hpp"
 
 #include <cstring>
 
+#include "gn10_can/core/can_frame.hpp"
+
 namespace robomas_can {
-RobomasCAN::RobomasCAN(gn10_can::CANBus& bus) : bus_(bus)
+RobomasData::RobomasData(gn10_can::drivers::ICanDriver& can_driver) : can_driver_(can_driver)
 {
     // 初期化処理
     for (int i = 0; i < 8; i++) {
@@ -11,7 +13,7 @@ RobomasCAN::RobomasCAN(gn10_can::CANBus& bus) : bus_(bus)
     }
 }
 
-void RobomasCAN::set_motor_type(uint8_t motor_number, bool motor_type)
+void RobomasData::set_motor_type(uint8_t motor_number, bool motor_type)
 {
     if (motor_number > 7) return;
 
@@ -22,7 +24,7 @@ void RobomasCAN::set_motor_type(uint8_t motor_number, bool motor_type)
     }
 }
 
-void RobomasCAN::set_current_can1(
+void RobomasData::set_current_can1(
     float motor0_current, float motor1_current, float motor2_current, float motor3_current
 )
 {
@@ -33,7 +35,7 @@ void RobomasCAN::set_current_can1(
     send_currents(SEND_CANID_1_4, reinterpret_cast<uint8_t*>(&motor_current_[0]));
 }
 
-void RobomasCAN::set_current_can2(
+void RobomasData::set_current_can2(
     float motor4_current, float motor5_current, float motor6_current, float motor7_current
 )
 {
@@ -44,7 +46,7 @@ void RobomasCAN::set_current_can2(
     send_currents(SEND_CANID_5_8, reinterpret_cast<uint8_t*>(&motor_current_[1]));
 }
 
-float RobomasCAN::get_current(uint8_t motor_number) const
+float RobomasData::get_current(uint8_t motor_number) const
 {
     if (motor_number > 7) return 0.0f;
 
@@ -53,19 +55,20 @@ float RobomasCAN::get_current(uint8_t motor_number) const
     return motor_current_[group].current[index];
 }
 
-void RobomasCAN::send_currents(uint16_t can_id, uint8_t* data)
+void RobomasData::send_currents(uint16_t can_id, uint8_t* data)
 {
-    frame_.id  = can_id;
-    frame_.dlc = 8;  // robomasは8byte固定
+    gn10_can::CANFrame frame;
+    frame.id  = can_id;
+    frame.dlc = 8;  // robomasは8byte固定
     for (int i = 0; i < 4; i++) {
         float current_float;
         memcpy(&current_float, &data[i * 4], 4);  // floatは4バイト
 
         int16_t current_int16 = __builtin_bswap16(static_cast<int16_t>(current_float));
-        memcpy(&frame_.data[i * 2], &current_int16, 2);
+        memcpy(&frame.data[i * 2], &current_int16, 2);
     }
 
-    bus_.send_frame(frame_);
+    can_driver_.send(frame);
 }
 
 }  // namespace robomas_can
