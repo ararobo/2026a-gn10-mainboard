@@ -37,10 +37,12 @@ add_executable(${CMAKE_PROJECT_NAME})
 add_subdirectory(cmake/stm32cubemx)
 
 # User Application
+
+
 add_subdirectory(gn10_can)
 add_subdirectory(gn10_mainboard)
 add_subdirectory(wiznet_ether)
-
+add_subdirectory(robomas_can)
 # Link directories setup
 target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined library search paths
@@ -68,5 +70,6 @@ list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)
 target_link_libraries(${CMAKE_PROJECT_NAME}
     stm32cubemx
     gn10_mainboard
+    robomas_can
     # Add user defined libraries
 )

@@ -6,6 +6,7 @@
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_mainboard/three_wheel_omni.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
+#include "robomas_can/c620_can.hpp"
 
 namespace {
 
@@ -74,6 +75,7 @@ void loop()
     wheel_back_l.set_target(wheel_angular_velocity_back_l);
     wheel_back_r.set_target(wheel_angular_velocity_back_r);
     update_heartbeat_led();
+    // robomas用の
     HAL_Delay(10);
 }
 extern "C" {
