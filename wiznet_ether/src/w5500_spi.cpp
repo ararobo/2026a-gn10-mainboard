@@ -145,11 +145,14 @@ bool W5500Init()
 
     // W5500IOInit();
 
-    // send reset signal
+    HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);  // CS HIGH is default
 
+    // send reset signal
+    HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_RESET);  // RST LOW
     tmp = 0xFF;
     while (tmp--)  // 一定時間待つ
         ;
+    HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);  // RST HIGH
 
     // ライブラリへ自作関数の紐付け
     reg_wizchip_cs_cbfunc(wizchip_select, wizchip_deselect);  // CSのコールバック関数を登録
