@@ -64,21 +64,25 @@ void setup()
     can1_driver.init();
     ethernet.init();
 
-    pid_config_wheel_fr.kp = 0.1f;
-    pid_config_wheel_fr.ki = 0.0f;
-    pid_config_wheel_fr.kd = 0.0f;
+    pid_config_wheel_fr.kp           = 0.1f;
+    pid_config_wheel_fr.ki           = 0.0f;
+    pid_config_wheel_fr.kd           = 0.0f;
+    pid_config_wheel_fr.output_limit = 20.0f;
     pid_wheel_fr.update_config(pid_config_wheel_fr);
-    pid_config_wheel_fl.kp = 0.1f;
-    pid_config_wheel_fl.ki = 0.0f;
-    pid_config_wheel_fl.kd = 0.0f;
+    pid_config_wheel_fl.kp           = 0.1f;
+    pid_config_wheel_fl.ki           = 0.0f;
+    pid_config_wheel_fl.kd           = 0.0f;
+    pid_config_wheel_fl.output_limit = 20.0f;
     pid_wheel_fl.update_config(pid_config_wheel_fl);
-    pid_config_wheel_bl.kp = 0.1f;
-    pid_config_wheel_bl.ki = 0.0f;
-    pid_config_wheel_bl.kd = 0.0f;
+    pid_config_wheel_bl.kp           = 0.1f;
+    pid_config_wheel_bl.ki           = 0.0f;
+    pid_config_wheel_bl.kd           = 0.0f;
+    pid_config_wheel_bl.output_limit = 20.0f;
     pid_wheel_bl.update_config(pid_config_wheel_bl);
-    pid_config_wheel_br.kp = 0.1f;
-    pid_config_wheel_br.ki = 0.0f;
-    pid_config_wheel_br.kd = 0.0f;
+    pid_config_wheel_br.kp           = 0.1f;
+    pid_config_wheel_br.ki           = 0.0f;
+    pid_config_wheel_br.kd           = 0.0f;
+    pid_config_wheel_br.output_limit = 20.0f;
     pid_wheel_br.update_config(pid_config_wheel_br);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
@@ -89,7 +93,10 @@ void setup()
  */
 void loop()
 {
-    ethernet.receive_operation_data(&operation);
+    // ethernet.receive_operation_data(&operation);
+    operation.vx    = 20.0f;
+    operation.vy    = 20.0f;
+    operation.omega = 100.0f;
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
         &wheel_angular_velocity_fr,
@@ -97,6 +104,7 @@ void loop()
         &wheel_angular_velocity_bl,
         &wheel_angular_velocity_br
     );
+
     wheel_angular_velocity_fr_feedback =
         2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(0) / 60.0f;
     wheel_angular_velocity_fl_feedback =
