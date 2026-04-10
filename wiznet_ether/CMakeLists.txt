@@ -6,6 +6,7 @@ add_library(wiznet_ether STATIC
     src/w5500_spi.cpp
     src/w5500.cpp
     src/wizchip_conf.cpp
+    src/serial_printf.cpp
 )
 
 target_include_directories(wiznet_ether PUBLIC
