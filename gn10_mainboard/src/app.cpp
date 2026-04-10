@@ -53,6 +53,7 @@ void setup()
     wheel_config.set_max_duty_ratio(1.0f);
     wheel_front.set_init(wheel_config);
     wheel_back_l.set_init(wheel_config);
+    wheel_back_r.set_init(wheel_config);
     HAL_Delay(1000);
     ethernet.init();
     heartbeat_last_toggle_time_ms = HAL_GetTick();
