@@ -10,20 +10,20 @@
  */
 #pragma once
 
-#include "gn10_can/drivers/driver_interface.hpp"
+#include "gn10_can/drivers/fdcan_driver_interface.hpp"
 #include "main.h"
 
 namespace gn10_can {
 namespace drivers {
 
-class FDCANDriver : public ICanDriver
+class FDCANDriver : public IFDCANDriver
 {
 public:
     FDCANDriver(FDCAN_HandleTypeDef* hfdcan) : hfdcan_(hfdcan) {}
 
     bool init();
-    bool send(const CANFrame& frame) override;
-    bool receive(CANFrame& out_frame) override;
+    bool send(const FDCANFrame& frame) override;
+    bool receive(FDCANFrame& out_frame) override;
 
 private:
     FDCAN_HandleTypeDef* hfdcan_;

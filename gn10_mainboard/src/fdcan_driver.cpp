@@ -25,7 +25,7 @@ bool FDCANDriver::init()
     return true;
 }
 
-bool FDCANDriver::send(const CANFrame& frame)
+bool FDCANDriver::send(const FDCANFrame& frame)
 {
     FDCAN_TxHeaderTypeDef tx_header;
     if (frame.is_extended) {
@@ -50,7 +50,7 @@ bool FDCANDriver::send(const CANFrame& frame)
     return true;
 }
 
-bool FDCANDriver::receive(CANFrame& out_frame)
+bool FDCANDriver::receive(FDCANFrame& out_frame)
 {
     FDCAN_RxHeaderTypeDef rx_header;
     uint8_t rx_data[64];
