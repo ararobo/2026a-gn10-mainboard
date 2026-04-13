@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 add_library(gn10_mainboard STATIC
     src/app.cpp
     src/mecanum_wheel.cpp
+    src/fdcan_driver.cpp
     ${CMAKE_SOURCE_DIR}/gn10_can/drivers/stm32_fdcan/driver_stm32_fdcan.cpp
 )
 
