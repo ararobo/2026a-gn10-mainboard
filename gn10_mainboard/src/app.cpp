@@ -35,7 +35,6 @@ void update_heartbeat_led()
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
 gn10_can::drivers::FDCANDriver fdcan2_driver(&hfdcan2);
 
-gn10_can::CANBus can1_bus(can1_driver);
 gn10_can::FDCANBus fdcan2_bus(fdcan2_driver);
 
 robomas_can::C620CAN wheel_esc(can1_driver);
@@ -149,7 +148,6 @@ extern "C" {
  */
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    can1_bus.update();
     fdcan2_bus.update();
     gn10_can::CANFrame rx_frame;
     can1_driver.receive(rx_frame);
