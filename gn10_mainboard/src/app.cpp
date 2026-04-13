@@ -4,6 +4,7 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
+#include "gn10_can/devices/robot_control_hub_server.hpp"
 #include "gn10_mainboard/three_wheel_omni.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
 
