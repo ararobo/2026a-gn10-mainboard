@@ -35,7 +35,6 @@ gn10_can::devices::MotorDriverClient wheel_back_r(can1_bus, 2);
 
 gn10_can::devices::MotorConfig wheel_config;
 
-RobotEthernet ethernet;
 ThreeWheelOmni omni(0.2f, 0.06f);
 
 operation_data_t operation;
@@ -55,7 +54,6 @@ void setup()
     wheel_back_l.set_init(wheel_config);
     wheel_back_r.set_init(wheel_config);
     HAL_Delay(1000);
-    ethernet.init();
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
 
@@ -64,7 +62,6 @@ void setup()
  */
 void loop()
 {
-    ethernet.receive_operation_data(&operation);
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
         &wheel_angular_velocity_front,
