@@ -3,7 +3,7 @@
 namespace gn10_can {
 namespace drivers {
 
-bool DriverSTM32FDCAN::init()
+bool FDCANDriver::init()
 {
     FDCAN_FilterTypeDef filter;
     filter.IdType       = FDCAN_STANDARD_ID;
@@ -25,7 +25,7 @@ bool DriverSTM32FDCAN::init()
     return true;
 }
 
-bool DriverSTM32FDCAN::send(const CANFrame& frame)
+bool FDCANDriver::send(const CANFrame& frame)
 {
     FDCAN_TxHeaderTypeDef tx_header;
     if (frame.is_extended) {
@@ -50,7 +50,7 @@ bool DriverSTM32FDCAN::send(const CANFrame& frame)
     return true;
 }
 
-bool DriverSTM32FDCAN::receive(CANFrame& out_frame)
+bool FDCANDriver::receive(CANFrame& out_frame)
 {
     FDCAN_RxHeaderTypeDef rx_header;
     uint8_t rx_data[64];

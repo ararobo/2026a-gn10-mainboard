@@ -16,10 +16,10 @@
 namespace gn10_can {
 namespace drivers {
 
-class DriverSTM32FDCAN : public ICanDriver
+class FDCANDriver : public ICanDriver
 {
 public:
-    DriverSTM32FDCAN(FDCAN_HandleTypeDef* hfdcan) : hfdcan_(hfdcan) {}
+    FDCANDriver(FDCAN_HandleTypeDef* hfdcan) : hfdcan_(hfdcan) {}
 
     bool init();
     bool send(const CANFrame& frame) override;
