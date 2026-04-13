@@ -5,8 +5,10 @@
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_can/devices/robot_control_hub_server.hpp"
+#include "gn10_mainboard/fdcan_driver.hpp"
 #include "gn10_mainboard/three_wheel_omni.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
+#include "wiznet_ether/serial_printf.hpp"
 
 namespace {
 
@@ -29,12 +31,20 @@ void update_heartbeat_led()
 }  // namespace
 
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
+gn10_can::drivers::FDCANDriver fdcan2_driver(&hfdcan2);
+
 gn10_can::CANBus can1_bus(can1_driver);
+gn10_can::FDCANBus fdcan2_bus(fdcan2_driver);
+
 gn10_can::devices::MotorDriverClient wheel_front(can1_bus, 0);
 gn10_can::devices::MotorDriverClient wheel_back_l(can1_bus, 1);
 gn10_can::devices::MotorDriverClient wheel_back_r(can1_bus, 2);
 
 gn10_can::devices::MotorConfig wheel_config;
+
+gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robot_control_hub(
+    fdcan2_bus, 0
+);
 
 ThreeWheelOmni omni(0.2f, 0.06f);
 
@@ -49,6 +59,7 @@ float wheel_angular_velocity_back_r = 0;
 void setup()
 {
     can1_driver.init();
+    fdcan2_driver.init();
     wheel_config.set_accel_ratio(1.0f);
     wheel_config.set_max_duty_ratio(1.0f);
     wheel_front.set_init(wheel_config);
@@ -63,6 +74,9 @@ void setup()
  */
 void loop()
 {
+    if (robot_control_hub.get_command(operation)) {
+        serial_printf("received command!\n");
+    }
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
         &wheel_angular_velocity_front,
