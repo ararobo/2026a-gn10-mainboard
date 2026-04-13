@@ -153,7 +153,6 @@ bool W5500Init()
     while (tmp--)  // 一定時間待つ
         ;
     HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);  // RST HIGH
-
     // ライブラリへ自作関数の紐付け
     reg_wizchip_cs_cbfunc(wizchip_select, wizchip_deselect);  // CSのコールバック関数を登録
     reg_wizchip_spi_cbfunc(wizchip_read, wizchip_write);      // SPIのコールバック関数を登録
