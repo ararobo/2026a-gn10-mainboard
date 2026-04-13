@@ -97,5 +97,6 @@ extern "C" {
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     can1_bus.update();
+    fdcan2_bus.update();
 }
 }
