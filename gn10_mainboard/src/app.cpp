@@ -75,7 +75,6 @@ void setup()
 void loop()
 {
     if (robot_control_hub.get_command(operation)) {
-        serial_printf("received command!\n");
     }
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
