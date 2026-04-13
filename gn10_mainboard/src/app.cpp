@@ -93,10 +93,6 @@ void setup()
  */
 void loop()
 {
-    // ethernet.receive_operation_data(&operation);
-    operation.vx    = 20.0f;
-    operation.vy    = 20.0f;
-    operation.omega = 100.0f;
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
         &wheel_angular_velocity_fr,
