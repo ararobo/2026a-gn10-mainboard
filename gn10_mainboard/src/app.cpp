@@ -38,18 +38,12 @@ gn10_can::drivers::FDCANDriver fdcan2_driver(&hfdcan2);
 gn10_can::CANBus can1_bus(can1_driver);
 gn10_can::FDCANBus fdcan2_bus(fdcan2_driver);
 
-gn10_can::devices::MotorDriverClient wheel_front(can1_bus, 0);
-gn10_can::devices::MotorDriverClient wheel_back_l(can1_bus, 1);
-gn10_can::devices::MotorDriverClient wheel_back_r(can1_bus, 2);
-
-gn10_can::devices::MotorConfig wheel_config;
 robomas_can::C620CAN wheel_esc(can1_driver);
 
 gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robot_control_hub(
     fdcan2_bus, 0
 );
 
-ThreeWheelOmni omni(0.2f, 0.06f);
 RobotEthernet ethernet;
 FourWheelOmni omni(0.2f, 0.06f);
 
@@ -81,13 +75,6 @@ void setup()
 {
     can1_driver.init();
     fdcan2_driver.init();
-    wheel_config.set_accel_ratio(1.0f);
-    wheel_config.set_max_duty_ratio(1.0f);
-    wheel_front.set_init(wheel_config);
-    wheel_back_l.set_init(wheel_config);
-    wheel_back_r.set_init(wheel_config);
-    HAL_Delay(1000);
-    ethernet.init();
 
     pid_config_wheel_fr.kp           = 0.1f;
     pid_config_wheel_fr.ki           = 0.0f;
