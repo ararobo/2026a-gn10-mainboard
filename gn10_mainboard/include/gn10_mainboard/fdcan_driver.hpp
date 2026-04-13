@@ -26,6 +26,7 @@ public:
     bool receive(FDCANFrame& out_frame) override;
 
 private:
+    uint32_t convert_dlc_to_bytes(uint32_t dlc);
     FDCAN_HandleTypeDef* hfdcan_;
 };
 }  // namespace drivers
