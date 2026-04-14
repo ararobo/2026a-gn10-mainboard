@@ -32,8 +32,8 @@ void update_heartbeat_led()
 
 }  // namespace
 
-gn10_can::drivers::DriverSTM32FDCAN can2_driver(&hfdcan1);
-gn10_can::drivers::FDCANDriver fdcan1_driver(&hfdcan2);
+gn10_can::drivers::DriverSTM32FDCAN can2_driver(&hfdcan2);
+gn10_can::drivers::FDCANDriver fdcan1_driver(&hfdcan1);
 
 gn10_can::FDCANBus fdcan2_bus(fdcan1_driver);
 
@@ -133,9 +133,7 @@ void loop()
     wheel_currents[3] =
         pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.01f);
 
-    wheel_esc.set_current_can1(
-        wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
-    );
+    wheel_esc.set_current_can1(20.0f, wheel_currents[1], wheel_currents[2], wheel_currents[3]);
 
     update_heartbeat_led();
     // robomas用の
