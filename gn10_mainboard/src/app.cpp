@@ -32,12 +32,12 @@ void update_heartbeat_led()
 
 }  // namespace
 
-gn10_can::drivers::DriverSTM32FDCAN can2_driver(&hfdcan2);
-gn10_can::drivers::FDCANDriver fdcan1_driver(&hfdcan1);
+gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
+gn10_can::drivers::FDCANDriver fdcan2_driver(&hfdcan2);
 
-gn10_can::FDCANBus fdcan2_bus(fdcan1_driver);
+gn10_can::FDCANBus fdcan2_bus(fdcan2_driver);
 
-robomas_can::C620CAN wheel_esc(can2_driver);
+robomas_can::C620CAN wheel_esc(can1_driver);
 
 gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robot_control_hub(
     fdcan2_bus, 0
@@ -72,8 +72,8 @@ float wheel_angular_velocity_br_feedback = 0.0f;
  */
 void setup()
 {
-    can2_driver.init();
-    fdcan1_driver.init();
+    can1_driver.init();
+    fdcan2_driver.init();
 
     pid_config_wheel_fr.kp           = 0.1f;
     pid_config_wheel_fr.ki           = 0.0f;
@@ -133,7 +133,9 @@ void loop()
     wheel_currents[3] =
         pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.01f);
 
-    wheel_esc.set_current_can1(20.0f, wheel_currents[1], wheel_currents[2], wheel_currents[3]);
+    wheel_esc.set_current_can1(
+        wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
+    );
 
     update_heartbeat_led();
     // robomas用の
@@ -148,7 +150,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
     fdcan2_bus.update();
     gn10_can::CANFrame rx_frame;
-    can2_driver.receive(rx_frame);
+    can1_driver.receive(rx_frame);
     wheel_esc.receive_data(rx_frame.id, rx_frame.data.data());
 }
 }
