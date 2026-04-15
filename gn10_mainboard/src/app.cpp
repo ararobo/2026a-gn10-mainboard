@@ -43,7 +43,6 @@ gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robo
     fdcan2_bus, 0
 );
 
-RobotEthernet ethernet;
 FourWheelOmni omni(0.2f, 0.06f);
 
 gn10_motor::PIDConfig<float> pid_config_wheel_fr;
@@ -137,6 +136,11 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
+    // serial_printf("%d\n", wheel_angular_velocity_br);
+    //  serial_printf("%d", wheel_angular_velocity_bl);
+    //  serial_printf("%d\n", wheel_angular_velocity_fr);
+    //  serial_printf("%d", wheel_angular_velocity_fl);
+    serial_printf("%d\n", wheel_currents);
     update_heartbeat_led();
     // robomas用の
     HAL_Delay(10);
@@ -148,9 +152,12 @@ extern "C" {
  */
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    fdcan2_bus.update();
-    gn10_can::CANFrame rx_frame;
-    can1_driver.receive(rx_frame);
-    wheel_esc.receive_data(rx_frame.id, rx_frame.data.data());
+    if (hfdcan->Instance == hfdcan1.Instance) {
+        gn10_can::CANFrame rx_frame;
+        can1_driver.receive(rx_frame);
+        wheel_esc.receive_data(rx_frame.id, rx_frame.data.data());
+    } else if (hfdcan->Instance == hfdcan2.Instance) {
+        fdcan2_bus.update();
+    }
 }
 }
