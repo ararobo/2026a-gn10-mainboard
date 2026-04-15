@@ -123,14 +123,18 @@ void loop()
         2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(3) / 60.0f;
 
     float wheel_currents[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-    wheel_currents[0] =
-        pid_wheel_fr.update(wheel_angular_velocity_fr, wheel_angular_velocity_fr_feedback, 0.01f);
-    wheel_currents[1] =
-        pid_wheel_fl.update(wheel_angular_velocity_fl, wheel_angular_velocity_fl_feedback, 0.01f);
-    wheel_currents[2] =
-        pid_wheel_bl.update(wheel_angular_velocity_bl, wheel_angular_velocity_bl_feedback, 0.01f);
-    wheel_currents[3] =
-        pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.01f);
+    wheel_currents[0]       = pid_wheel_fr.update(
+        wheel_angular_velocity_fr * 1500, wheel_angular_velocity_fr_feedback, 0.01f
+    );
+    wheel_currents[1] = pid_wheel_fl.update(
+        wheel_angular_velocity_fl * 1500, wheel_angular_velocity_fl_feedback, 0.01f
+    );
+    wheel_currents[2] = pid_wheel_bl.update(
+        wheel_angular_velocity_bl * 1500, wheel_angular_velocity_bl_feedback, 0.01f
+    );
+    wheel_currents[3] = pid_wheel_br.update(
+        wheel_angular_velocity_br * 1500, wheel_angular_velocity_br_feedback, 0.01f
+    );
 
     wheel_esc.set_current_can1(
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
@@ -140,7 +144,7 @@ void loop()
     //  serial_printf("%d", wheel_angular_velocity_bl);
     //  serial_printf("%d\n", wheel_angular_velocity_fr);
     //  serial_printf("%d", wheel_angular_velocity_fl);
-    serial_printf("%d\n", wheel_currents);
+    serial_printf("%f\n", wheel_currents[0]);
     update_heartbeat_led();
     // robomas用の
     HAL_Delay(10);
