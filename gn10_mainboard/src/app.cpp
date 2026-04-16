@@ -43,7 +43,7 @@ gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robo
     fdcan2_bus, 0
 );
 
-FourWheelOmni omni(0.2f, 0.006f);
+FourWheelOmni omni(0.2f, 0.05f);
 
 gn10_motor::PIDConfig<float> pid_config_wheel_fr;
 gn10_motor::PIDConfig<float> pid_config_wheel_fl;
@@ -74,22 +74,22 @@ void setup()
     can1_driver.init();
     fdcan2_driver.init();
 
-    pid_config_wheel_fr.kp           = 0.1f;
+    pid_config_wheel_fr.kp           = 1.709f;
     pid_config_wheel_fr.ki           = 0.0f;
     pid_config_wheel_fr.kd           = 0.0f;
     pid_config_wheel_fr.output_limit = 20.0f;
     pid_wheel_fr.update_config(pid_config_wheel_fr);
-    pid_config_wheel_fl.kp           = 0.01f;
+    pid_config_wheel_fl.kp           = 1.709f;
     pid_config_wheel_fl.ki           = 0.0f;
     pid_config_wheel_fl.kd           = 0.0f;
     pid_config_wheel_fl.output_limit = 20.0f;
     pid_wheel_fl.update_config(pid_config_wheel_fl);
-    pid_config_wheel_bl.kp           = 0.01f;
+    pid_config_wheel_bl.kp           = 1.709f;
     pid_config_wheel_bl.ki           = 0.0f;
     pid_config_wheel_bl.kd           = 0.0f;
     pid_config_wheel_bl.output_limit = 20.0f;
     pid_wheel_bl.update_config(pid_config_wheel_bl);
-    pid_config_wheel_br.kp           = 0.01f;
+    pid_config_wheel_br.kp           = 1.709f;
     pid_config_wheel_br.ki           = 0.0f;
     pid_config_wheel_br.kd           = 0.0f;
     pid_config_wheel_br.output_limit = 20.0f;
