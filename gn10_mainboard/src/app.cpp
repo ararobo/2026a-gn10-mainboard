@@ -43,7 +43,7 @@ gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robo
     fdcan2_bus, 0
 );
 
-FourWheelOmni omni(0.2f, 0.05f);
+FourWheelOmni omni(0.3f, 0.065f);
 
 gn10_motor::PIDConfig<float> pid_config_wheel_fr;
 gn10_motor::PIDConfig<float> pid_config_wheel_fl;
@@ -74,22 +74,24 @@ void setup()
     can1_driver.init();
     fdcan2_driver.init();
 
-    pid_config_wheel_fr.kp           = 1.414f;
+    pid_config_wheel_fr.kp           = 0.5f;
     pid_config_wheel_fr.ki           = 0.0f;
     pid_config_wheel_fr.kd           = 0.0f;
     pid_config_wheel_fr.output_limit = 20.0f;
     pid_wheel_fr.update_config(pid_config_wheel_fr);
-    pid_config_wheel_fl.kp           = 1.414f;
+    pid_config_wheel_fl.kp           = 0.5f;
     pid_config_wheel_fl.ki           = 0.0f;
     pid_config_wheel_fl.kd           = 0.0f;
     pid_config_wheel_fl.output_limit = 20.0f;
     pid_wheel_fl.update_config(pid_config_wheel_fl);
-    pid_config_wheel_bl.kp           = 1.414f;
+    // pid_config_wheel_bl.kp           = 0.35f;
+    pid_config_wheel_bl.kp           = 0.5f;
     pid_config_wheel_bl.ki           = 0.0f;
     pid_config_wheel_bl.kd           = 0.0f;
     pid_config_wheel_bl.output_limit = 20.0f;
     pid_wheel_bl.update_config(pid_config_wheel_bl);
-    pid_config_wheel_br.kp           = 1.414f;
+    // pid_config_wheel_br.kp           = 0.35f;
+    pid_config_wheel_br.kp           = 0.5f;
     pid_config_wheel_br.ki           = 0.0f;
     pid_config_wheel_br.kd           = 0.0f;
     pid_config_wheel_br.output_limit = 20.0f;
@@ -113,47 +115,32 @@ void loop()
         &wheel_angular_velocity_br
     );
 
-    // serial_printf("%f\n", operation.vy);
-    // serial_printf("%f\n", wheel_angular_velocity_fr);
-
     wheel_angular_velocity_fr_feedback =
-        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(0) / 60.0f;
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(0) / 60.0f / 19.0f;
     wheel_angular_velocity_fl_feedback =
-        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(1) / 60.0f;
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(1) / 60.0f / 19.0f;
     wheel_angular_velocity_bl_feedback =
-        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(2) / 60.0f;
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(2) / 60.0f / 19.0f;
     wheel_angular_velocity_br_feedback =
-        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(3) / 60.0f;
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(3) / 60.0f / 19.0f;
 
     float wheel_currents[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     wheel_currents[0] =
-        pid_wheel_fr.update(wheel_angular_velocity_fr, wheel_angular_velocity_fr_feedback, 0.01f) *
-        0.1;
+        pid_wheel_fr.update(wheel_angular_velocity_fr, wheel_angular_velocity_fr_feedback, 0.001f);
     wheel_currents[1] =
-        pid_wheel_fl.update(wheel_angular_velocity_fl, wheel_angular_velocity_fl_feedback, 0.01f);
+        pid_wheel_fl.update(wheel_angular_velocity_fl, wheel_angular_velocity_fl_feedback, 0.001f);
     wheel_currents[2] =
-        pid_wheel_bl.update(wheel_angular_velocity_bl, wheel_angular_velocity_bl_feedback, 0.01f);
+        pid_wheel_bl.update(wheel_angular_velocity_bl, wheel_angular_velocity_bl_feedback, 0.001f);
     wheel_currents[3] =
-        pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.01f);
+        pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.001f);
 
     wheel_esc.set_current_can1(
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
-    serial_printf("%f,fe\n", wheel_currents[0]);
-    // serial_printf("%d\n", wheel_angular_velocity_br);
-    //  serial_printf("%d", wheel_angular_velocity_bl);
-    //  serial_printf("%d\n", wheel_angular_velocity_fr);
-    //  serial_printf("%d", wheel_angular_velocity_fl);
-    // serial_printf("%f\n", wheel_currents[0]);
-    // serial_printf("%f\n", wheel_angular_velocity_fr);  // 上と同じ値
-    // serial_printf("%f\n", wheel_angular_velocity_fr_feedback);  // feedbackは0
-    // serial_printf("%f\n", operation.vx); //最大値1
-    //  serial_printf("%f\n", operation.vy);  // 最大値1
-    // serial_printf("%f\n", operation.omega);
     update_heartbeat_led();
     //     robomas用の
-    HAL_Delay(10);
+    HAL_Delay(1);
 }
 extern "C" {
 // C言語側の関数のオーバーライド
