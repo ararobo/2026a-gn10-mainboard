@@ -1,17 +1,19 @@
 #include "gn10_mainboard/app.hpp"
 
+#include <cmath>
+
 #include "drivers/stm32_fdcan/driver_stm32_fdcan.hpp"
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_can/devices/robot_control_hub_server.hpp"
+#include "gn10_can/devices/servo_motor_client.hpp"
 #include "gn10_mainboard/fdcan_driver.hpp"
 #include "gn10_mainboard/four_wheel_omni.hpp"
 #include "gn10_mainboard/pid.hpp"
 #include "robomas_can/c620_can.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
 #include "wiznet_ether/serial_printf.hpp"
-
 namespace {
 
 constexpr uint32_t k_heartbeat_toggle_interval_ms = 500;
@@ -34,11 +36,13 @@ void update_heartbeat_led()
 
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
 gn10_can::drivers::FDCANDriver fdcan2_driver(&hfdcan2);
+gn10_can::drivers::DriverSTM32FDCAN can3_driver(&hfdcan3);
 
 gn10_can::FDCANBus fdcan2_bus(fdcan2_driver);
+gn10_can::CANBus can3_bus(can3_driver);
 
 robomas_can::C620CAN wheel_esc(can1_driver);
-
+gn10_can::devices::ServoMotorClient servo_motor(can3_bus, 0);
 gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robot_control_hub(
     fdcan2_bus, 0
 );
@@ -66,6 +70,7 @@ float wheel_angular_velocity_fl_feedback = 0.0f;
 float wheel_angular_velocity_bl_feedback = 0.0f;
 float wheel_angular_velocity_br_feedback = 0.0f;
 
+uint8_t servo_motor_counter = 0;
 /**
  * @brief Initialize CAN and mainboard application state.
  */
@@ -73,6 +78,7 @@ void setup()
 {
     can1_driver.init();
     fdcan2_driver.init();
+    can3_driver.init();
 
     pid_config_wheel_fr.kp           = 0.5f;
     pid_config_wheel_fr.ki           = 0.0f;
@@ -97,6 +103,7 @@ void setup()
     pid_config_wheel_br.output_limit = 20.0f;
     pid_wheel_br.update_config(pid_config_wheel_br);
 
+    servo_motor.set_init(500, 2500);
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
 
@@ -138,6 +145,7 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
+    servo_motor.set_angle_rad(M_PI);
     update_heartbeat_led();
     //     robomas用の
     HAL_Delay(1);
@@ -155,6 +163,8 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
         wheel_esc.receive_data(rx_frame.id, rx_frame.data.data());
     } else if (hfdcan->Instance == hfdcan2.Instance) {
         fdcan2_bus.update();
+    } else if (hfdcan->Instance == hfdcan3.Instance) {
+        can3_bus.update();
     }
 }
 }
