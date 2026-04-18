@@ -4,9 +4,13 @@
 #include "fdcan.h"
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
-#include "gn10_mainboard/three_wheel_omni.hpp"
+#include "gn10_can/devices/robot_control_hub_server.hpp"
+#include "gn10_mainboard/fdcan_driver.hpp"
+#include "gn10_mainboard/four_wheel_omni.hpp"
+#include "gn10_mainboard/pid.hpp"
 #include "robomas_can/c620_can.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
+#include "wiznet_ether/serial_printf.hpp"
 
 namespace {
 
@@ -29,20 +33,38 @@ void update_heartbeat_led()
 }  // namespace
 
 gn10_can::drivers::DriverSTM32FDCAN can1_driver(&hfdcan1);
-gn10_can::CANBus can1_bus(can1_driver);
-gn10_can::devices::MotorDriverClient wheel_front(can1_bus, 0);
-gn10_can::devices::MotorDriverClient wheel_back_l(can1_bus, 1);
-gn10_can::devices::MotorDriverClient wheel_back_r(can1_bus, 2);
+gn10_can::drivers::FDCANDriver fdcan2_driver(&hfdcan2);
 
-gn10_can::devices::MotorConfig wheel_config;
+gn10_can::FDCANBus fdcan2_bus(fdcan2_driver);
 
-RobotEthernet ethernet;
-ThreeWheelOmni omni(0.2f, 0.06f);
+robomas_can::C620CAN wheel_esc(can1_driver);
+
+gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robot_control_hub(
+    fdcan2_bus, 0
+);
+
+FourWheelOmni omni(0.3f, 0.065f);
+
+gn10_motor::PIDConfig<float> pid_config_wheel_fr;
+gn10_motor::PIDConfig<float> pid_config_wheel_fl;
+gn10_motor::PIDConfig<float> pid_config_wheel_bl;
+gn10_motor::PIDConfig<float> pid_config_wheel_br;
+
+gn10_motor::PID<float> pid_wheel_fr(pid_config_wheel_fr);
+gn10_motor::PID<float> pid_wheel_fl(pid_config_wheel_fl);
+gn10_motor::PID<float> pid_wheel_bl(pid_config_wheel_bl);
+gn10_motor::PID<float> pid_wheel_br(pid_config_wheel_br);
 
 operation_data_t operation;
-float wheel_angular_velocity_front  = 0;
-float wheel_angular_velocity_back_l = 0;
-float wheel_angular_velocity_back_r = 0;
+float wheel_angular_velocity_fr = 0.0f;
+float wheel_angular_velocity_fl = 0.0f;
+float wheel_angular_velocity_bl = 0.0f;
+float wheel_angular_velocity_br = 0.0f;
+
+float wheel_angular_velocity_fr_feedback = 0.0f;
+float wheel_angular_velocity_fl_feedback = 0.0f;
+float wheel_angular_velocity_bl_feedback = 0.0f;
+float wheel_angular_velocity_br_feedback = 0.0f;
 
 /**
  * @brief Initialize CAN and mainboard application state.
@@ -50,12 +72,30 @@ float wheel_angular_velocity_back_r = 0;
 void setup()
 {
     can1_driver.init();
-    ethernet.init();
-    wheel_config.set_accel_ratio(1.0f);
-    wheel_config.set_max_duty_ratio(1.0f);
-    wheel_front.set_init(wheel_config);
-    wheel_back_l.set_init(wheel_config);
-    wheel_back_r.set_init(wheel_config);
+    fdcan2_driver.init();
+
+    pid_config_wheel_fr.kp           = 0.5f;
+    pid_config_wheel_fr.ki           = 0.0f;
+    pid_config_wheel_fr.kd           = 0.0f;
+    pid_config_wheel_fr.output_limit = 20.0f;
+    pid_wheel_fr.update_config(pid_config_wheel_fr);
+    pid_config_wheel_fl.kp           = 0.5f;
+    pid_config_wheel_fl.ki           = 0.0f;
+    pid_config_wheel_fl.kd           = 0.0f;
+    pid_config_wheel_fl.output_limit = 20.0f;
+    pid_wheel_fl.update_config(pid_config_wheel_fl);
+    // pid_config_wheel_bl.kp           = 0.35f;
+    pid_config_wheel_bl.kp           = 0.5f;
+    pid_config_wheel_bl.ki           = 0.0f;
+    pid_config_wheel_bl.kd           = 0.0f;
+    pid_config_wheel_bl.output_limit = 20.0f;
+    pid_wheel_bl.update_config(pid_config_wheel_bl);
+    // pid_config_wheel_br.kp           = 0.35f;
+    pid_config_wheel_br.kp           = 0.5f;
+    pid_config_wheel_br.ki           = 0.0f;
+    pid_config_wheel_br.kd           = 0.0f;
+    pid_config_wheel_br.output_limit = 20.0f;
+    pid_wheel_br.update_config(pid_config_wheel_br);
 
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
@@ -65,19 +105,42 @@ void setup()
  */
 void loop()
 {
-    ethernet.receive_operation_data(&operation);
+    if (robot_control_hub.get_command(operation)) {
+    }
     omni.convert(operation.vx, operation.vy, operation.omega, 0.0f);
     omni.getWheelAngularVelocity(
-        &wheel_angular_velocity_front,
-        &wheel_angular_velocity_back_l,
-        &wheel_angular_velocity_back_r
+        &wheel_angular_velocity_fr,
+        &wheel_angular_velocity_fl,
+        &wheel_angular_velocity_bl,
+        &wheel_angular_velocity_br
     );
-    wheel_front.set_target(wheel_angular_velocity_front);
-    wheel_back_l.set_target(wheel_angular_velocity_back_l);
-    wheel_back_r.set_target(wheel_angular_velocity_back_r);
+
+    wheel_angular_velocity_fr_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(0) / 60.0f / 19.0f;
+    wheel_angular_velocity_fl_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(1) / 60.0f / 19.0f;
+    wheel_angular_velocity_bl_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(2) / 60.0f / 19.0f;
+    wheel_angular_velocity_br_feedback =
+        2.0f * 3.1415f * (float)wheel_esc.get_feedback_speed(3) / 60.0f / 19.0f;
+
+    float wheel_currents[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    wheel_currents[0] =
+        pid_wheel_fr.update(wheel_angular_velocity_fr, wheel_angular_velocity_fr_feedback, 0.001f);
+    wheel_currents[1] =
+        pid_wheel_fl.update(wheel_angular_velocity_fl, wheel_angular_velocity_fl_feedback, 0.001f);
+    wheel_currents[2] =
+        pid_wheel_bl.update(wheel_angular_velocity_bl, wheel_angular_velocity_bl_feedback, 0.001f);
+    wheel_currents[3] =
+        pid_wheel_br.update(wheel_angular_velocity_br, wheel_angular_velocity_br_feedback, 0.001f);
+
+    wheel_esc.set_current_can1(
+        wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
+    );
+
     update_heartbeat_led();
-    // robomas用の
-    HAL_Delay(10);
+    //     robomas用の
+    HAL_Delay(1);
 }
 extern "C" {
 // C言語側の関数のオーバーライド
@@ -86,6 +149,12 @@ extern "C" {
  */
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef* hfdcan, uint32_t RxFifo0ITs)
 {
-    can1_bus.update();
+    if (hfdcan->Instance == hfdcan1.Instance) {
+        gn10_can::CANFrame rx_frame;
+        can1_driver.receive(rx_frame);
+        wheel_esc.receive_data(rx_frame.id, rx_frame.data.data());
+    } else if (hfdcan->Instance == hfdcan2.Instance) {
+        fdcan2_bus.update();
+    }
 }
 }
