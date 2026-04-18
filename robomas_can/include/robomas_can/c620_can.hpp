@@ -20,7 +20,7 @@ private:
 
 public:
     // コンストラクタ
-    C620CAN(gn10_can::drivers::ICanDriver& can_driver) : RobomasData(can_driver) {}
+    C620CAN(gn10_can::drivers::ICANDriver& can_driver) : RobomasData(can_driver) {}
 
     // 純粋仮想関数の実装
     void receive_data(uint16_t can_id, uint8_t data[8]) override;

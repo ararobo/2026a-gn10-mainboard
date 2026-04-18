@@ -5,7 +5,7 @@
 #include "gn10_can/core/can_frame.hpp"
 
 namespace robomas_can {
-RobomasData::RobomasData(gn10_can::drivers::ICanDriver& can_driver) : can_driver_(can_driver)
+RobomasData::RobomasData(gn10_can::drivers::ICANDriver& can_driver) : can_driver_(can_driver)
 {
     // 初期化処理
     for (int i = 0; i < 8; i++) {
