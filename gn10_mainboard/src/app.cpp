@@ -70,6 +70,12 @@ float wheel_angular_velocity_fl_feedback = 0.0f;
 float wheel_angular_velocity_bl_feedback = 0.0f;
 float wheel_angular_velocity_br_feedback = 0.0f;
 
+// buttons config
+bool cross    = false;
+bool circle   = false;
+bool square   = false;
+bool triangle = false;
+
 uint8_t servo_motor_counter = 0;
 /**
  * @brief Initialize CAN and mainboard application state.
@@ -145,9 +151,21 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
-    servo_motor.set_angle_rad(M_PI);
+    // button
+    if ((square = operation.buttons & 1)) {
+        servo_motor.set_angle_rad(M_PI);
+    }
+    if (cross = (operation.buttons >> 1) & 1) {
+        servo_motor.set_angle_rad(M_PI);
+    }
+    if (circle = (operation.buttons >> 2) & 1) {
+        servo_motor.set_angle_rad(0);
+    }
+    if (triangle = (operation.buttons >> 3) & 1) {
+        servo_motor.set_angle_rad(0);
+    }
     update_heartbeat_led();
-    //     robomas用の
+    // robomas用の
     HAL_Delay(1);
 }
 extern "C" {

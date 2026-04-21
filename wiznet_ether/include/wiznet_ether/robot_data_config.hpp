@@ -20,8 +20,10 @@ struct feedback_data_t {
 } __attribute__((__packed__));
 
 struct operation_data_t {
-    uint32_t header;  // ヘッダー
+    uint16_t header;  // ヘッダー
     float vx;         // x軸方向の速度[m/s]
     float vy;         // y軸方向の速度[m/s]
     float omega;      // 回転速度[rad/s]
+    uint8_t buttons;
+    uint8_t reserved;
 } __attribute__((__packed__));
