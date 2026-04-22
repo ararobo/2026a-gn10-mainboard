@@ -76,7 +76,6 @@ bool circle   = false;
 bool square   = false;
 bool triangle = false;
 
-uint8_t servo_motor_counter = 0;
 /**
  * @brief Initialize CAN and mainboard application state.
  */
@@ -151,17 +150,19 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
-    // button
+    cross    = (operation.buttons >> 1) & 1;
+    circle   = (operation.buttons >> 2) & 1;
+    triangle = (operation.buttons >> 3) & 1;
     if ((square = operation.buttons & 1)) {
         servo_motor.set_angle_rad(M_PI);
     }
-    if (cross = (operation.buttons >> 1) & 1) {
+    if (cross) {
         servo_motor.set_angle_rad(M_PI);
     }
-    if (circle = (operation.buttons >> 2) & 1) {
+    if (circle) {
         servo_motor.set_angle_rad(0);
     }
-    if (triangle = (operation.buttons >> 3) & 1) {
+    if (triangle) {
         servo_motor.set_angle_rad(0);
     }
     update_heartbeat_led();
