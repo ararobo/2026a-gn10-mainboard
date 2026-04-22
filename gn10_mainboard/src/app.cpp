@@ -109,7 +109,7 @@ void setup()
     pid_config_wheel_br.output_limit = 20.0f;
     pid_wheel_br.update_config(pid_config_wheel_br);
 
-    servo_motor.set_init(500, 2500);
+    servo_motor.set_init(1000, 1200);
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
 
