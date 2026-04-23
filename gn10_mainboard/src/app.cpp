@@ -150,12 +150,17 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
-    cross    = (operation.buttons >> 1) & 1;
-    circle   = (operation.buttons >> 2) & 1;
-    triangle = (operation.buttons >> 3) & 1;
+    // cross    = (operation.buttons >> 1) & 1;
+    // circle   = (operation.buttons >> 2) & 1;
+    // triangle = (operation.buttons >> 3) & 1;
+
     if ((square = operation.buttons & 1)) {
         servo_motor.set_angle_rad(M_PI);
+    } else {
+        servo_motor.set_angle_rad(0);
     }
+
+    /*
     if (cross) {
         servo_motor.set_angle_rad(M_PI);
     }
@@ -165,6 +170,7 @@ void loop()
     if (triangle) {
         servo_motor.set_angle_rad(0);
     }
+    */
     update_heartbeat_led();
     // robomas用の
     HAL_Delay(1);
