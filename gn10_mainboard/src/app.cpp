@@ -14,6 +14,7 @@
 #include "robomas_can/c620_can.hpp"
 #include "wiznet_ether/robot_ethernet.hpp"
 #include "wiznet_ether/serial_printf.hpp"
+
 namespace {
 
 constexpr uint32_t k_heartbeat_toggle_interval_ms = 500;
@@ -46,6 +47,8 @@ gn10_can::devices::ServoMotorClient servo_motor(can3_bus, 0);
 gn10_can::devices::RobotControlHubServer<operation_data_t, feedback_data_t> robot_control_hub(
     fdcan2_bus, 0
 );
+gn10_can::devices::MotorDriverClient motor(can3_bus, 0);
+gn10_can::devices::MotorConfig motor_config;
 
 FourWheelOmni omni(0.3f, 0.065f);
 
@@ -85,6 +88,11 @@ void setup()
     fdcan2_driver.init();
     can3_driver.init();
 
+    motor_config.set_accel_ratio(1.0f);
+    motor_config.set_max_duty_ratio(1.0f);
+    motor.set_init(motor_config);
+
+    // asimawari
     pid_config_wheel_fr.kp           = 0.5f;
     pid_config_wheel_fr.ki           = 0.0f;
     pid_config_wheel_fr.kd           = 0.0f;
@@ -95,13 +103,11 @@ void setup()
     pid_config_wheel_fl.kd           = 0.0f;
     pid_config_wheel_fl.output_limit = 20.0f;
     pid_wheel_fl.update_config(pid_config_wheel_fl);
-    // pid_config_wheel_bl.kp           = 0.35f;
     pid_config_wheel_bl.kp           = 0.5f;
     pid_config_wheel_bl.ki           = 0.0f;
     pid_config_wheel_bl.kd           = 0.0f;
     pid_config_wheel_bl.output_limit = 20.0f;
     pid_wheel_bl.update_config(pid_config_wheel_bl);
-    // pid_config_wheel_br.kp           = 0.35f;
     pid_config_wheel_br.kp           = 0.5f;
     pid_config_wheel_br.ki           = 0.0f;
     pid_config_wheel_br.kd           = 0.0f;
@@ -150,7 +156,6 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
-    // cross    = (operation.buttons >> 1) & 1;
     // circle   = (operation.buttons >> 2) & 1;
     // triangle = (operation.buttons >> 3) & 1;
 
@@ -159,11 +164,17 @@ void loop()
     } else {
         servo_motor.set_angle_rad(0);
     }
+    if (cross = (operation.buttons >> 1) & 1) {
+        if (cross) {
+            motor.set_target(100);
+            cross = false;
+        } else {
+            motor.set_target(0);
+            cross = true;
+        }
+    }
 
     /*
-    if (cross) {
-        servo_motor.set_angle_rad(M_PI);
-    }
     if (circle) {
         servo_motor.set_angle_rad(0);
     }
