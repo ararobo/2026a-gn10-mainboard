@@ -156,6 +156,7 @@ void loop()
         wheel_currents[0], wheel_currents[1], wheel_currents[2], wheel_currents[3]
     );
 
+    cross = (operation.buttons >> 1) & 1;
     // circle   = (operation.buttons >> 2) & 1;
     // triangle = (operation.buttons >> 3) & 1;
 
@@ -164,14 +165,21 @@ void loop()
     } else {
         servo_motor.set_angle_rad(0);
     }
-    if (cross = (operation.buttons >> 1) & 1) {
-        if (cross) {
-            motor.set_target(100);
-            cross = false;
-        } else {
-            motor.set_target(0);
-            cross = true;
-        }
+
+    static bool prev_cross   = false;
+    static bool motor_active = false;
+
+    bool cross_rising = cross && !prev_cross;
+
+    prev_cross = cross;
+
+    if (cross_rising) {
+        motor_active = !motor_active;
+    }
+    if (motor_active) {
+        motor.set_target(1.0f);
+    } else {
+        motor.set_target(0);
     }
 
     /*
@@ -182,7 +190,6 @@ void loop()
         servo_motor.set_angle_rad(0);
     }
     */
-    update_heartbeat_led();
     // robomas用の
     HAL_Delay(1);
 }
