@@ -23,6 +23,7 @@
 namespace {
 /* ----------------- 定数 ----------------------*/
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;
+constexpr float SOLVE_LOADING_DEVIATION         = 0.9690f;
 constexpr float M3508_GEAR_RATIO                = 19.0f;
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
 constexpr uint32_t FEEDBACK_INTERVAL_MS         = 100;
@@ -210,7 +211,7 @@ void command_robot_drivers(const robot_config::command_t& command)
     // loading
     if (!reload_success) {
         arm_hold_and_loading_target[2] =
-            -static_cast<float>(reload_count) * static_cast<float>(M_PI) * 2 / 3;
+            -static_cast<float>(reload_count) * 3.14f * 2 / 3 * SOLVE_LOADING_DEVIATION;
         reload_success = true;
     }
 
@@ -246,6 +247,8 @@ void setup()
     // Motor configuration
     motor_config_wheel.set_motor_type(gn10_can::devices::MotorType::C620);
     motor_config_wheel.set_encoder_type(gn10_can::devices::EncoderType::None);
+    motor_config_wheel.set_max_duty_ratio(20.0f);
+    motor_config_wheel.set_accel_ratio(1.0f);
 
     motor_config_hand.set_motor_type(gn10_can::devices::MotorType::C610);
     motor_config_hand.set_encoder_type(gn10_can::devices::EncoderType::None);
@@ -266,10 +269,10 @@ void setup()
     // Initialize devices on the network
     for (uint8_t i = 0; i < 4; i++) {
         esc_wheel.set_init(i, motor_config_wheel);
-        esc_wheel.set_gains(i, 0.1f, 0.0f, 0.0f, 0.0f);
+        esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
     }
     esc_arm_hold_and_loading.set_init(1, motor_config_hand);
-    esc_arm_hold_and_loading.set_gains(1, 0.005f, 0.0f, 0.0f, 0.0f);
+    esc_arm_hold_and_loading.set_gains(1, 0.001f, 0.0f, 0.0f, 0.0f);
 
     dc_arm_hight.set_init(motor_config_arm_hight);
     solenoid.set_init();
@@ -286,12 +289,13 @@ void setup()
     conversion.set_bucket_hight_value(100);
     conversion.set_bucket_limit_value(11000, 0);
 
-    conversion.set_wheel_max_vel(3.0f);
-    conversion.set_angular_max_vel(3.0f);
+    conversion.set_wheel_max_vel(4.5f);
+    conversion.set_angular_max_vel(4.5f);
 
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
+std::array<float, 4> loading_feedback = {};
 
 /**
  * @brief Run one control cycle and update status heartbeat LED.
@@ -310,6 +314,16 @@ void loop()
         reload_enabled    = true;
         vesc_throwing     = false;
         release_time_tick = now_ms;
+    }
+
+    if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
+        serial_printf(
+            "%f, %f, %f, %f\n",
+            loading_feedback[0],
+            loading_feedback[1],
+            loading_feedback[2],
+            loading_feedback[3]
+        );
     }
 
     if (reload_enabled && (now_ms - release_time_tick >= RELOAD_DELAY_MS)) {
