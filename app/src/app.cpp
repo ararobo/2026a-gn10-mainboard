@@ -11,6 +11,7 @@
 #include "gn10_can/devices/robot_control_hub_server.hpp"
 #include "gn10_can/devices/solenoid_driver_client.hpp"
 // gn10-mainboard
+#include "app/bucket_arm_controller.hpp"
 #include "app/conversion_command.hpp"
 #include "app/robot_ethernet.hpp"
 #include "app/serial_printf.hpp"
@@ -22,7 +23,9 @@
 
 namespace {
 /* ----------------- 定数 ----------------------*/
-constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;
+constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;  // [m]
+constexpr float BUCKET_ARM_HEIGHT_MAX           = 1.0f;    // [m]
+constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.1f;    // [m]
 constexpr float SOLVE_LOADING_DEVIATION         = 0.9690f;
 constexpr float M3508_GEAR_RATIO                = 19.0f;
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
@@ -68,6 +71,8 @@ robot_config::command_t last_command_{};
 ThreeWheelOmni omni(0.4f, 0.13f / 2.0f);
 
 /* ----------------------- robot control --------------------------*/
+// 装填・アーム出力値
+std::array<float, 4> arm_hold_and_loading_target{0.0f, 0.0f, 0.0f, 0.0f};
 // 装填
 uint8_t reload_count = 0;     // 装填回数
 bool reload_success  = true;  // 装填成功
@@ -80,7 +85,9 @@ bool initialized_vesc = false;          // VESCを一度でも初期化したか
 bool vesc_throwing    = false;          // VESCを動かして射出しているかどうか（射出命令）
 
 // バケツアーム
-std::array<float, 4> arm_hold_and_loading_target{0.0f, 0.0f, 0.0f, 0.0f};
+BucketArmController bucket_arm(
+    BUCKET_ARM_HEIGHT_PULLEY_RADIUS, BUCKET_ARM_HEIGHT_MAX, BUCKET_ARM_HEIGHT_MIN
+);
 
 /* --------------------- コントローラー（teleop）との通信 ---------------------*/
 robot_config::teleop_t teleop{};
@@ -178,39 +185,22 @@ void command_robot_drivers(const robot_config::command_t& command)
     solenoid_targets[1] = command.air_launcher_for_desk_r;
     solenoid_targets[2] = command.air_launcher_for_desk_l;
     solenoid.set_target(solenoid_targets);
-
-    // Control the arm with C610
-
-    arm_hold_and_loading_target[0] = static_cast<float>(command.bucket_arm_hight) * 0.1f /
-                                     BUCKET_ARM_HEIGHT_PULLEY_RADIUS;  //[rad]
-
-    // hold
-    if (command.bucket_arm_hold) {
-        arm_hold_and_loading_target[1] = M_1_PI / 2 / 0.001f;
+    // バケツ用アーム
+    float arm_hight_target = 0.0f;
+    if (teleop.buttons.left_down) {
+        arm_hight_target =
+            bucket_arm.height_motor_output(teleop.buttons.right_up, teleop.buttons.right_down);
+        arm_hold_and_loading_target[1] = bucket_arm.hold_motor_output(teleop.buttons.right_right);
     }
-    if (!command.bucket_arm_hold) {
-        arm_hold_and_loading_target[1] = -M_1_PI / 2 / 0.001f;
-    }
-
-    // loading
+    // 装填
     if (!reload_success) {
         arm_hold_and_loading_target[2] =
             -static_cast<float>(reload_count) * 3.14f * 2 / 3 * SOLVE_LOADING_DEVIATION;
         reload_success = true;
     }
-
+    // CAN通信
     esc_arm_hold_and_loading.set_targets(arm_hold_and_loading_target.data());
-
-    float arm_hight_vel = 0.0f;
-    if (teleop.buttons.left_down) {
-        if (teleop.buttons.right_up) {
-            arm_hight_vel = -1.0f;
-        }
-        if (teleop.buttons.right_down) {
-            arm_hight_vel = 1.0f;
-        }
-    }
-    dc_arm_hight.set_target(arm_hight_vel);
+    dc_arm_hight.set_target(arm_hight_target);
     last_command_ = command;
 }
 
@@ -275,6 +265,10 @@ void setup()
 
     conversion.set_wheel_max_vel(4.5f);
     conversion.set_angular_max_vel(4.5f);
+
+    bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
+    bucket_arm.set_hold_force_by_current(0.01f);
+    bucket_arm.set_release_force_by_current(0.005f);
 
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
