@@ -322,16 +322,18 @@ void loop()
     }
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
     }
-    // WIP ゼロ点からの[rad]なので、単位換算がまだ済んでいない
+    float latest_arm_hight_motor_angle = dc_arm_hight.feedback_value();
+    bucket_arm.set_height_motor_angle(latest_arm_hight_motor_angle);
+    // ゼロ点合わせが済んだらエンコーダーの値から高さを計算してフィードバックに代入
     if (dc_arm_hight_encoder_initialized) {
-        robot_feedback.bucket_arm_hight = dc_arm_hight.feedback_value();
-    } else {
+        robot_feedback.bucket_arm_hight = bucket_arm.angle_to_height(latest_arm_hight_motor_angle);
+    } else {  // ゼロ点取りが済んでいない場合、リミットスイッチで最高点を設定する
         uint8_t dc_arm_hight_limit_sw = dc_arm_hight.limit_switches();
         if ((dc_arm_hight_limit_sw & 0b1)) {
             dc_arm_hight.set_init(motor_config_arm_hight);
             dc_arm_hight_encoder_initialized = true;
         }
-        robot_feedback.bucket_arm_hight = 0.0f;
+        robot_feedback.bucket_arm_hight = 0.0f;  // ゼロ点があっていない間は0とする。
     }
 
     if (reload_enabled && (now_ms - release_time_tick >= RELOAD_DELAY_MS)) {
