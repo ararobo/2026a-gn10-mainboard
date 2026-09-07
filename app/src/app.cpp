@@ -317,13 +317,6 @@ void loop()
     }
 
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
-        serial_printf(
-            "%f, %f, %f, %f\n",
-            loading_feedback[0],
-            loading_feedback[1],
-            loading_feedback[2],
-            loading_feedback[3]
-        );
     }
 
     if (reload_enabled && (now_ms - release_time_tick >= RELOAD_DELAY_MS)) {
