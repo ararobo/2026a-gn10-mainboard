@@ -80,7 +80,7 @@ robot_config::command_t ConversionCommand::conversion(robot_config::teleop_t& te
     /* ベルト直動*/
     // belt_throw
     if (!teleop.buttons.left_down) {
-        if (teleop.buttons.right_right && teleop_last_.buttons.right_right) {
+        if (teleop.buttons.right_right && !teleop_last_.buttons.right_right) {
             command_.belt_throw = teleop.buttons.right_right;
         }
         // belt出力調整
