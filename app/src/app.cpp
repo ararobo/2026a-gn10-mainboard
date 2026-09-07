@@ -86,7 +86,6 @@ bool initialized_vesc = false;          // VESCを一度でも初期化したか
 bool vesc_throwing    = false;          // VESCを動かして射出しているかどうか（射出命令）
 
 // バケツアーム
-std::array<float, 4> arm_hold_and_loading_target{0.0f, 0.0f, 0.0f, 0.0f};
 bool dc_arm_hight_encoder_initialized = false;
 BucketArmController bucket_arm(
     BUCKET_ARM_HEIGHT_PULLEY_RADIUS, BUCKET_ARM_HEIGHT_MAX, BUCKET_ARM_HEIGHT_MIN
