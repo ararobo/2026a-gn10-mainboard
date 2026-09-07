@@ -2,10 +2,10 @@
  * @file robot_data_config.hpp
  * @author tmcit-ararobo-2026a
  * @brief ロボットの通信データ構造体定義
- * @version 2.1
- * @date 2025-10-03
+ * @version 2.2
+ * @date 2026-09-07
  *
- * @copyright Copyright (c) 2025
+ * @copyright Copyright (c) 2026
  *
  * socket_cmd (port:26574)
  *  |-  operation    pc          ->  main-board
@@ -84,8 +84,19 @@ static_assert(sizeof(command_t) == 32);
  *
  */
 struct feedback_t {
-    uint8_t header;  // ヘッダー
-    float belt_vel_last;
+    uint8_t header;    // ヘッダー
+    uint8_t sequence;  // シーケンス番号
+    // 電源周り
+    bool emergency_stop_enabled;
+    bool over_current;
+    float drive_battery_voltages;
+    float logic_battery_voltages[2];
+    float drive_current;
+    // 各アクチュエータ
+    float wheel_angular_velocity[3];  // 0:front 1:left 2:right
+    float belt_launcher_velocity;     // [m/s]
+    float loading_belt_angle;         // 装填機構のプーリー角度[rad]
+    float bucket_arm_hight;           // バケツアームの高さ[m]
 } __attribute__((__packed__));
 
 union feedback_u {
@@ -93,7 +104,7 @@ union feedback_u {
     uint8_t binary[sizeof(feedback_t)];
 } __attribute__((__packed__));
 
-static_assert(sizeof(feedback_t) == 5);
+static_assert(sizeof(feedback_t) == 44);
 
 /**
  * @brief 操縦デバイスのレバーの傾きと押し込み

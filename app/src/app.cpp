@@ -29,6 +29,7 @@ constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.1f;    // [m]
 constexpr float SOLVE_LOADING_DEVIATION         = 0.9690f;
 constexpr float M3508_GEAR_RATIO                = 19.0f;
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
+constexpr uint32_t FEEDBACK_INTERVAL_MS         = 100;
 constexpr uint32_t RELOAD_DELAY_MS              = 2000;
 constexpr uint32_t ETHER_INIT_DELAY_MS          = 1000;
 /* ---------------------- gn10-can ---------------------- */
@@ -85,6 +86,8 @@ bool initialized_vesc = false;          // VESCを一度でも初期化したか
 bool vesc_throwing    = false;          // VESCを動かして射出しているかどうか（射出命令）
 
 // バケツアーム
+std::array<float, 4> arm_hold_and_loading_target{0.0f, 0.0f, 0.0f, 0.0f};
+bool dc_arm_hight_encoder_initialized = false;
 BucketArmController bucket_arm(
     BUCKET_ARM_HEIGHT_PULLEY_RADIUS, BUCKET_ARM_HEIGHT_MAX, BUCKET_ARM_HEIGHT_MIN
 );
@@ -94,6 +97,7 @@ robot_config::teleop_t teleop{};
 
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
+robot_config::feedback_t robot_feedback{};
 
 /* ------------------ Lチカ ----------------------- */
 uint32_t heartbeat_last_toggle_time_ms = 0;
@@ -106,6 +110,22 @@ void update_heartbeat_led()
     if ((now_ms - heartbeat_last_toggle_time_ms) >= HEARTBEAT_TOGGLE_INTERVAL_MS) {
         heartbeat_last_toggle_time_ms = now_ms;
         HAL_GPIO_TogglePin(LED_BLUE_GPIO_Port, LED_BLUE_Pin);
+    }
+}
+
+uint32_t feedback_last_send_time_ms = 0;
+/**
+ * @brief 一定周期でフィードバックをEthernetで送信する
+ *
+ */
+void periodic_feedback()
+{
+    const uint32_t now_ms = HAL_GetTick();
+    if ((now_ms - feedback_last_send_time_ms) >= FEEDBACK_INTERVAL_MS) {
+        feedback_last_send_time_ms = now_ms;
+        if (ether.send_feedback_data(robot_feedback)) {
+            robot_feedback.sequence++;
+        }
     }
 }
 
@@ -232,7 +252,8 @@ void setup()
     motor_config_arm_hight.set_max_duty_ratio(0.75f);
     motor_config_arm_hight.set_reverse_limit_switch(true, 0);
     motor_config_arm_hight.set_motor_type(gn10_can::devices::MotorType::DC);
-    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::None);
+    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_arm_hight.set_feedback_cycle(10);
 
     // Other device configuration
     drive_power_manager_config.sensor_rate_ms            = 100;
@@ -281,20 +302,36 @@ std::array<float, 4> loading_feedback = {};
 void loop()
 {
     const uint32_t now_ms = HAL_GetTick();
-    // Get latest teleop
+    // 指令値取得
     if (ether.receive_teleop(teleop)) {
         robot_config::command_t command;
         command = conversion.conversion(teleop);
         command_robot_drivers(command);
     }
-    // Get latest belt angular velocity
+    // フィードバック処理
+    std::array<float, 4> wheel_feedbacks{};
+    if (esc_wheel.get_feedbacks(wheel_feedbacks.data())) {
+        robot_feedback.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
+        robot_feedback.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
+        robot_feedback.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
+    }
     if (vesc_hub.get_feedbacks(vesc_feedbacks.data())) {
         reload_enabled    = true;
         vesc_throwing     = false;
         release_time_tick = now_ms;
     }
-
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
+    }
+    // WIP ゼロ点からの[rad]なので、単位換算がまだ済んでいない
+    if (dc_arm_hight_encoder_initialized) {
+        robot_feedback.bucket_arm_hight = dc_arm_hight.feedback_value();
+    } else {
+        uint8_t dc_arm_hight_limit_sw = dc_arm_hight.limit_switches();
+        if ((dc_arm_hight_limit_sw & 0b1)) {
+            dc_arm_hight.set_init(motor_config_arm_hight);
+            dc_arm_hight_encoder_initialized = true;
+        }
+        robot_feedback.bucket_arm_hight = 0.0f;
     }
 
     if (reload_enabled && (now_ms - release_time_tick >= RELOAD_DELAY_MS)) {
@@ -302,7 +339,25 @@ void loop()
         reload_enabled = false;
     }
 
+    gn10_can::devices::power_manager::Sensor drive_power_sensor{};
+    if (drive_power_manager.get_new_sensor(drive_power_sensor)) {
+        robot_feedback.drive_battery_voltages = drive_power_sensor.voltage;
+        robot_feedback.drive_current          = drive_power_sensor.current;
+    }
+    gn10_can::devices::power_manager::Status drive_power_status{};
+    if (drive_power_manager.get_new_status(drive_power_status)) {
+        robot_feedback.emergency_stop_enabled = drive_power_status.emergency_stop_enabled;
+        robot_feedback.over_current           = drive_power_status.over_current;
+    }
+    std::array<float, 4> voltages;
+    if (logic_power_manager.get_new_voltages(voltages)) {
+        robot_feedback.logic_battery_voltages[1] = voltages[1];
+        robot_feedback.logic_battery_voltages[2] = voltages[2];
+        robot_feedback.logic_battery_voltages[3] = voltages[3];
+    }
+
     read_button_and_send_debug_pc_packet();
+    periodic_feedback();
 
     // Basic System Process
     update_heartbeat_led();
