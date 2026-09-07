@@ -114,7 +114,9 @@ void periodic_feedback()
     const uint32_t now_ms = HAL_GetTick();
     if ((now_ms - feedback_last_send_time_ms) >= FEEDBACK_INTERVAL_MS) {
         feedback_last_send_time_ms = now_ms;
-        ether.send_feedback_data(robot_feedback);
+        if (ether.send_feedback_data(robot_feedback)) {
+            robot_feedback.sequence++;
+        }
     }
 }
 
