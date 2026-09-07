@@ -82,6 +82,7 @@ bool vesc_throwing    = false;          // VESCを動かして射出している
 
 // バケツアーム
 std::array<float, 4> arm_hold_and_loading_target{0.0f, 0.0f, 0.0f, 0.0f};
+bool dc_arm_hight_encoder_initialized = false;
 
 /* --------------------- コントローラー（teleop）との通信 ---------------------*/
 robot_config::teleop_t teleop{};
@@ -260,7 +261,8 @@ void setup()
     motor_config_arm_hight.set_max_duty_ratio(0.75f);
     motor_config_arm_hight.set_reverse_limit_switch(true, 0);
     motor_config_arm_hight.set_motor_type(gn10_can::devices::MotorType::DC);
-    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::None);
+    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_arm_hight.set_feedback_cycle(10);
 
     // Other device configuration
     drive_power_manager_config.sensor_rate_ms            = 100;
@@ -324,6 +326,17 @@ void loop()
         release_time_tick = now_ms;
     }
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
+    }
+    // WIP ゼロ点からの[rad]なので、単位換算がまだ済んでいない
+    if (dc_arm_hight_encoder_initialized) {
+        robot_feedback.bucket_arm_hight = dc_arm_hight.feedback_value();
+    } else {
+        uint8_t dc_arm_hight_limit_sw = dc_arm_hight.limit_switches();
+        if ((dc_arm_hight_limit_sw & 0b1)) {
+            dc_arm_hight.set_init(motor_config_arm_hight);
+            dc_arm_hight_encoder_initialized = true;
+        }
+        robot_feedback.bucket_arm_hight = 0.0f;
     }
 
     if (reload_enabled && (now_ms - release_time_tick >= RELOAD_DELAY_MS)) {
