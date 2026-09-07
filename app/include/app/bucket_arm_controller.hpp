@@ -42,6 +42,16 @@ public:
     }
 
     /**
+     * @brief Set the height motor angle object
+     *
+     * @param angle_rad 回転角[rad](最高点(リミットスイッチ作動位置)を0として降下方向を+)
+     */
+    void set_height_motor_angle(float angle_rad)
+    {
+        height_motor_angle_ = angle_rad;
+    }
+
+    /**
      * @brief 高さ[m]を回転角[rad]に変換[
      * @note ゼロ除算を避けるため、プーリー半径が0以下では0を返す
      *
@@ -72,10 +82,9 @@ public:
      *
      * @param up 上昇
      * @param down 降下
-     * @param angle_rad 回転角[rad](最高点(リミットスイッチ作動位置)を0として降下方向を+)
      * @return float 高さ調整用モーター出力[ratio](上昇方向を+、降下方向を-)
      */
-    float height_motor_output(bool up, bool down, float angle_rad) const;
+    float height_motor_output(bool up, bool down) const;
 
     /**
      * @brief ハンド保持用モーターの出力を計算
@@ -92,4 +101,5 @@ private:
     float height_adjustment_velocity_ratio_{};
     float hold_current_{};
     float release_current_{};
+    float height_motor_angle_{};
 };
