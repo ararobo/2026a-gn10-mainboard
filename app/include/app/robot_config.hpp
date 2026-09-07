@@ -2,10 +2,10 @@
  * @file robot_data_config.hpp
  * @author tmcit-ararobo-2026a
  * @brief ロボットの通信データ構造体定義
- * @version 2.1
- * @date 2025-10-03
+ * @version 2.2
+ * @date 2026-09-07
  *
- * @copyright Copyright (c) 2025
+ * @copyright Copyright (c) 2026
  *
  * socket_cmd (port:26574)
  *  |-  operation    pc          ->  main-board
