@@ -303,19 +303,24 @@ std::array<float, 4> loading_feedback = {};
 void loop()
 {
     const uint32_t now_ms = HAL_GetTick();
-    // Get latest teleop
+    // 指令値取得
     if (ether.receive_teleop(teleop)) {
         robot_config::command_t command;
         command = conversion.conversion(teleop);
         command_robot_drivers(command);
     }
-    // Get latest belt angular velocity
+    // フィードバック処理
+    std::array<float, 4> wheel_feedbacks{};
+    if (esc_wheel.get_feedbacks(wheel_feedbacks.data())) {
+        feedback_.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
+        feedback_.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
+        feedback_.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
+    }
     if (vesc_hub.get_feedbacks(vesc_feedbacks.data())) {
         reload_enabled    = true;
         vesc_throwing     = false;
         release_time_tick = now_ms;
     }
-
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
     }
 
