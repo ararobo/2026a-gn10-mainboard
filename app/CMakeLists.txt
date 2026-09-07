@@ -5,6 +5,7 @@ add_library(app STATIC
     src/serial_printf.cpp
     src/robot_ethernet.cpp
     src/conversion_command.cpp
+    src/bucket_arm_controller.cpp
 )
 
 target_include_directories(app PUBLIC
