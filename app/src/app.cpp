@@ -88,7 +88,7 @@ robot_config::teleop_t teleop{};
 
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
-robot_config::feedback_t feedback_{};
+robot_config::feedback_t robot_feedback{};
 
 /* ------------------ Lチカ ----------------------- */
 uint32_t heartbeat_last_toggle_time_ms = 0;
@@ -114,7 +114,7 @@ void periodic_feedback()
     const uint32_t now_ms = HAL_GetTick();
     if ((now_ms - feedback_last_send_time_ms) >= FEEDBACK_INTERVAL_MS) {
         feedback_last_send_time_ms = now_ms;
-        ether.send_feedback_data(feedback_);
+        ether.send_feedback_data(robot_feedback);
     }
 }
 
@@ -312,9 +312,9 @@ void loop()
     // フィードバック処理
     std::array<float, 4> wheel_feedbacks{};
     if (esc_wheel.get_feedbacks(wheel_feedbacks.data())) {
-        feedback_.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
-        feedback_.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
-        feedback_.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
+        robot_feedback.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
+        robot_feedback.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
+        robot_feedback.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
     }
     if (vesc_hub.get_feedbacks(vesc_feedbacks.data())) {
         reload_enabled    = true;
@@ -331,19 +331,19 @@ void loop()
 
     gn10_can::devices::power_manager::Sensor drive_power_sensor{};
     if (drive_power_manager.get_new_sensor(drive_power_sensor)) {
-        feedback_.drive_battery_voltages = drive_power_sensor.voltage;
-        feedback_.drive_current          = drive_power_sensor.current;
+        robot_feedback.drive_battery_voltages = drive_power_sensor.voltage;
+        robot_feedback.drive_current          = drive_power_sensor.current;
     }
     gn10_can::devices::power_manager::Status drive_power_status{};
     if (drive_power_manager.get_new_status(drive_power_status)) {
-        feedback_.emergency_stop_enabled = drive_power_status.emergency_stop_enabled;
-        feedback_.over_current           = drive_power_status.over_current;
+        robot_feedback.emergency_stop_enabled = drive_power_status.emergency_stop_enabled;
+        robot_feedback.over_current           = drive_power_status.over_current;
     }
     std::array<float, 4> voltages;
     if (logic_power_manager.get_new_voltages(voltages)) {
-        feedback_.logic_battery_voltages[1] = voltages[1];
-        feedback_.logic_battery_voltages[2] = voltages[2];
-        feedback_.logic_battery_voltages[3] = voltages[3];
+        robot_feedback.logic_battery_voltages[1] = voltages[1];
+        robot_feedback.logic_battery_voltages[2] = voltages[2];
+        robot_feedback.logic_battery_voltages[3] = voltages[3];
     }
 
     read_button_and_send_debug_pc_packet();
