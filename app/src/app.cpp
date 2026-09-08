@@ -161,7 +161,7 @@ void reload_cloth()
         motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
 
         esc_arm_hold_and_loading.set_init(2, motor_config_loading);
-        esc_arm_hold_and_loading.set_gains(2, -1.0f, 0.0f, 0.0f, 0.0f);
+        esc_arm_hold_and_loading.set_gains(2, -2.0f, 0.0f, 0.0f, 0.0f);
     }
     reload_count++;
     reload_success = false;
