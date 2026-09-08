@@ -25,10 +25,12 @@
 
 namespace {
 /* ----------------- 定数 ----------------------*/
-constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 1.0f;
-constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 0.1f;
-constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 0.3f;
-constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.005f;
+constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 8.0f;
+constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 2.0f;
+constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 4.0f;
+constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.05f;
+constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA  = -(float)M_PI * 2.0f / 3.0f;
+constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS  = 2000;
 
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;  // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 1.0f;    // [m]
@@ -65,7 +67,7 @@ gn10_can::devices::ESCHubClient esc_arm_hold_and_loading(fdcan3_bus, 2);
 gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
-gn10_can::devices::LauncherClient belt_launcher_vesc(fdcan3_bus, 0);
+gn10_can::devices::LauncherClient belt_launcher_client(fdcan3_bus, 0);
 
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
@@ -100,6 +102,7 @@ BucketArmController bucket_arm(
 
 /* --------------------- コントローラー（teleop）との通信 ---------------------*/
 robot_config::teleop_t teleop{};
+robot_config::teleop_t last_teleop{};
 
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
@@ -191,19 +194,18 @@ void command_robot_drivers(const robot_config::command_t& command)
     esc_wheel.set_targets(wheel_targets.data());
 
     // ベルト直動
-    if (command.belt_init) {
-        initialized_vesc = true;
-        vesc_hub.set_init(0, motor_config_belt);
+    if (teleop.buttons.stick_push_right && !last_teleop.buttons.stick_push_right) {
+        belt_launcher_client.set_init();
     }
-    if (command.belt_throw && initialized_vesc && !last_command_.belt_throw) {
-        vesc_throwing = true;
+    belt_launcher_controller.update_velocity(teleop.buttons.right_up, teleop.buttons.right_down);
+    float belt_launcher_target_vel{};
+    if (!teleop.buttons.left_down) {
+        if (teleop.buttons.right_right && !last_teleop.buttons.right_right) {
+            if (belt_launcher_controller.fire(belt_launcher_target_vel)) {
+                belt_launcher_client.send_fire_command(belt_launcher_target_vel);
+            }
+        }
     }
-
-    std::array<float, 4> vesc_target{0.0f, 0.0f, 0.0f, 0.0f};
-    if (vesc_throwing) {
-        vesc_target[0] = command.belt_vel;
-    }
-    vesc_hub.set_targets(vesc_target.data());
 
     // エア射出
     std::array<bool, 8> solenoid_targets{};
@@ -219,10 +221,7 @@ void command_robot_drivers(const robot_config::command_t& command)
         arm_hold_and_loading_target[1] = bucket_arm.hold_motor_output(teleop.buttons.right_right);
     }
     // 装填
-    if (!reload_success) {
-        arm_hold_and_loading_target[2] =
-            -static_cast<float>(reload_count) * 3.14f * 2 / 3 * SOLVE_LOADING_DEVIATION;
-        reload_success = true;
+    if (belt_launcher_controller.load_a_cloth(arm_hold_and_loading_target[2], HAL_GetTick())) {
     }
     // CAN通信
     esc_arm_hold_and_loading.set_targets(arm_hold_and_loading_target.data());
@@ -297,6 +296,10 @@ void setup()
     bucket_arm.set_hold_force_by_current(0.01f);
     bucket_arm.set_release_force_by_current(0.005f);
 
+    belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
+    belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
+    belt_launcher_controller.set_reload_delay_ms(BELT_LAUNCHER_RELOAD_DELAY_MS);
+    belt_launcher_controller.set_reload_angle_delta(BELT_LAUNCHER_RELOAD_ANGLE_DELTA);
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
@@ -321,10 +324,13 @@ void loop()
         robot_feedback.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
         robot_feedback.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
     }
-    if (vesc_hub.get_feedbacks(vesc_feedbacks.data())) {
-        reload_enabled    = true;
-        vesc_throwing     = false;
-        release_time_tick = now_ms;
+    float belt_launcher_feedback_vel{};
+    if (belt_launcher_client.get_velocity_feedback(belt_launcher_feedback_vel)) {
+        robot_feedback.belt_launcher_velocity = belt_launcher_feedback_vel;
+    }
+    float belt_launcher_initial_angle{};
+    if (belt_launcher_client.get_initial_point(belt_launcher_initial_angle)) {
+        belt_launcher_controller.set_initial_point(HAL_GetTick());
     }
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
     }
@@ -340,11 +346,6 @@ void loop()
             dc_arm_hight_encoder_initialized = true;
         }
         robot_feedback.bucket_arm_hight = 0.0f;  // ゼロ点があっていない間は0とする。
-    }
-
-    if (reload_enabled && (now_ms - release_time_tick >= RELOAD_DELAY_MS)) {
-        reload_cloth();
-        reload_enabled = false;
     }
 
     gn10_can::devices::power_manager::Sensor drive_power_sensor{};
@@ -366,6 +367,7 @@ void loop()
 
     read_button_and_send_debug_pc_packet();
     periodic_feedback();
+    last_teleop = teleop;
 
     // Basic System Process
     update_heartbeat_led();
