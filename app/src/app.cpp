@@ -83,11 +83,6 @@ ThreeWheelOmni omni(0.4f, 0.13f / 2.0f);
 /* ----------------------- robot control --------------------------*/
 // 装填・アーム出力値
 std::array<float, 4> arm_hold_and_loading_target{0.0f, 0.0f, 0.0f, 0.0f};
-// 装填
-uint8_t reload_count = 0;     // 装填回数
-bool reload_success  = true;  // 装填成功
-bool reload_enabled  = false;
-uint32_t release_time_tick;
 
 // ベルト直動
 BeltLauncherController belt_launcher_controller(
@@ -161,20 +156,6 @@ void read_button_and_send_debug_pc_packet()
         ether.send_pc_debug_data(current_debug_pc);
         prev_debug_pc = current_debug_pc;
     }
-}
-
-void reload_cloth()
-{
-    if (reload_count == 0) {
-        motor_config_loading.set_max_duty_ratio(10.0f);
-        motor_config_loading.set_motor_type(gn10_can::devices::MotorType::C610);
-        motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
-
-        esc_arm_hold_and_loading.set_init(2, motor_config_loading);
-        esc_arm_hold_and_loading.set_gains(2, -1.0f, 0.0f, 0.0f, 0.0f);
-    }
-    reload_count++;
-    reload_success = false;
 }
 
 /**
@@ -310,7 +291,6 @@ std::array<float, 4> loading_feedback = {};
  */
 void loop()
 {
-    const uint32_t now_ms = HAL_GetTick();
     // 指令値取得
     if (ether.receive_teleop(teleop)) {
         robot_config::command_t command;
