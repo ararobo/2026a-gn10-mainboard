@@ -273,7 +273,7 @@ void setup()
     conversion.set_bucket_hight_value(100);
     conversion.set_bucket_limit_value(11000, 0);
 
-    conversion.set_wheel_max_vel(4.5f);
+    conversion.set_wheel_max_vel(4.0f);
     conversion.set_angular_max_vel(4.5f);
 
     // System setup
