@@ -6,11 +6,13 @@
 // gn10-can
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/esc_hub_client.hpp"
+#include "gn10_can/devices/launcher_client.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_can/devices/power_manager_client.hpp"
 #include "gn10_can/devices/robot_control_hub_server.hpp"
 #include "gn10_can/devices/solenoid_driver_client.hpp"
 // gn10-mainboard
+#include "app/belt_launcher_controller.hpp"
 #include "app/bucket_arm_controller.hpp"
 #include "app/conversion_command.hpp"
 #include "app/robot_ethernet.hpp"
@@ -23,14 +25,19 @@
 
 namespace {
 /* ----------------- 定数 ----------------------*/
+constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 1.0f;
+constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 0.1f;
+constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 0.3f;
+constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.005f;
+
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;  // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 1.0f;    // [m]
 constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.1f;    // [m]
-constexpr float SOLVE_LOADING_DEVIATION         = 0.9690f;
-constexpr float M3508_GEAR_RATIO                = 19.0f;
+
+constexpr float M3508_GEAR_RATIO = 19.0f;
+
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
 constexpr uint32_t FEEDBACK_INTERVAL_MS         = 100;
-constexpr uint32_t RELOAD_DELAY_MS              = 2000;
 constexpr uint32_t ETHER_INIT_DELAY_MS          = 1000;
 /* ---------------------- gn10-can ---------------------- */
 // Device Configuration
@@ -53,12 +60,12 @@ gn10_can::FDCANBus fdcan3_bus(fdcan3_driver);
 gn10_can::devices::SolenoidDriverClient solenoid(can1_bus, 0);
 gn10_can::devices::RobotControlHubServer<robot_config::command_t, robot_config::feedback_t>
     robot_control_hub(fdcan2_bus, 0);
-gn10_can::devices::ESCHubClient vesc_hub(fdcan3_bus, 0);
 gn10_can::devices::ESCHubClient esc_wheel(fdcan3_bus, 1);
 gn10_can::devices::ESCHubClient esc_arm_hold_and_loading(fdcan3_bus, 2);
 gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
+gn10_can::devices::LauncherClient belt_launcher_vesc(fdcan3_bus, 0);
 
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
@@ -81,9 +88,9 @@ bool reload_enabled  = false;
 uint32_t release_time_tick;
 
 // ベルト直動
-std::array<float, 4> vesc_feedbacks{};  // VESCからのフィードバック
-bool initialized_vesc = false;          // VESCを一度でも初期化したかどうか
-bool vesc_throwing    = false;          // VESCを動かして射出しているかどうか（射出命令）
+BeltLauncherController belt_launcher_controller(
+    BELT_LAUNCHER_MAX_VELOCITY, BELT_LAUNCHER_MIN_VELOCITY
+);
 
 // バケツアーム
 bool dc_arm_hight_encoder_initialized = false;
