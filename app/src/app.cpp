@@ -32,9 +32,9 @@ constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.05f;
 constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA  = -(float)M_PI * 2.0f / 3.0f;
 constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS  = 2000;
 
-constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;  // [m]
-constexpr float BUCKET_ARM_HEIGHT_MAX           = 1.0f;    // [m]
-constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.1f;    // [m]
+constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
+constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
+constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.075f;  // [m]
 
 constexpr float M3508_GEAR_RATIO = 19.0f;
 
@@ -273,12 +273,12 @@ void setup()
     conversion.set_bucket_hight_value(100);
     conversion.set_bucket_limit_value(11000, 0);
 
-    conversion.set_wheel_max_vel(4.5f);
+    conversion.set_wheel_max_vel(4.0f);
     conversion.set_angular_max_vel(4.5f);
 
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(0.01f);
-    bucket_arm.set_release_force_by_current(0.005f);
+    bucket_arm.set_hold_force_by_current(0.5f);
+    bucket_arm.set_release_force_by_current(0.25f);
 
     belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
     belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
@@ -317,7 +317,7 @@ void loop()
     }
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
     }
-    float latest_arm_hight_motor_angle = dc_arm_hight.feedback_value();
+    float latest_arm_hight_motor_angle = -dc_arm_hight.feedback_value();  // 降下方向を+とする
     bucket_arm.set_height_motor_angle(latest_arm_hight_motor_angle);
     // ゼロ点合わせが済んだらエンコーダーの値から高さを計算してフィードバックに代入
     if (dc_arm_hight_encoder_initialized) {
