@@ -178,7 +178,10 @@ void command_robot_drivers(const robot_config::command_t& command)
     if (teleop.buttons.stick_push_right && !last_teleop.buttons.stick_push_right) {
         belt_launcher_client.set_init();
     }
-    belt_launcher_controller.update_velocity(teleop.buttons.right_up, teleop.buttons.right_down);
+    belt_launcher_controller.update_velocity(
+        teleop.buttons.right_up && !last_teleop.buttons.right_up,
+        teleop.buttons.right_down && !last_teleop.buttons.right_down
+    );
     float belt_launcher_target_vel{};
     if (!teleop.buttons.left_down) {
         if (teleop.buttons.right_right && !last_teleop.buttons.right_right) {
