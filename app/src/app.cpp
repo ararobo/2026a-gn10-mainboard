@@ -23,9 +23,9 @@
 
 namespace {
 /* ----------------- 定数 ----------------------*/
-constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.122f;  // [m]
-constexpr float BUCKET_ARM_HEIGHT_MAX           = 1.0f;    // [m]
-constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.1f;    // [m]
+constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
+constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
+constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.075f;  // [m]
 constexpr float SOLVE_LOADING_DEVIATION         = 0.9690f;
 constexpr float M3508_GEAR_RATIO                = 19.0f;
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
@@ -287,8 +287,8 @@ void setup()
     conversion.set_angular_max_vel(4.5f);
 
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(0.01f);
-    bucket_arm.set_release_force_by_current(0.005f);
+    bucket_arm.set_hold_force_by_current(0.5f);
+    bucket_arm.set_release_force_by_current(0.25f);
 
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
@@ -321,7 +321,7 @@ void loop()
     }
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
     }
-    float latest_arm_hight_motor_angle = dc_arm_hight.feedback_value();
+    float latest_arm_hight_motor_angle = -dc_arm_hight.feedback_value();  // 降下方向を+とする
     bucket_arm.set_height_motor_angle(latest_arm_hight_motor_angle);
     // ゼロ点合わせが済んだらエンコーダーの値から高さを計算してフィードバックに代入
     if (dc_arm_hight_encoder_initialized) {
