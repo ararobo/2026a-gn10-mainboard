@@ -108,6 +108,7 @@ BucketArmController bucket_arm(
 robot_config::teleop_t teleop{};
 robot_config::teleop_t last_teleop{};
 uint32_t last_teleop_received_ms = 0;
+bool teleop_timeout              = false;
 
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
@@ -387,9 +388,11 @@ void loop()
     const uint32_t now_ms = HAL_GetTick();
     // 指令値取得
     if (ether.receive_teleop(teleop)) {
+        teleop_timeout          = false;
         last_teleop_received_ms = now_ms;
         command_robot_drivers();
-    } else if ((now_ms - last_teleop_received_ms) > TELEOP_TIMEOUT_MS) {
+    } else if ((now_ms - last_teleop_received_ms) > TELEOP_TIMEOUT_MS && !teleop_timeout) {
+        teleop_timeout = true;
         stop_all_actuators();
     }
     // フィードバック処理
