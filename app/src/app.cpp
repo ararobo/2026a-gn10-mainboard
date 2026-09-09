@@ -15,7 +15,6 @@
 // gn10-mainboard
 #include "app/belt_launcher_controller.hpp"
 #include "app/bucket_arm_controller.hpp"
-#include "app/conversion_command.hpp"
 #include "app/led_information.hpp"
 #include "app/robot_ethernet.hpp"
 #include "app/serial_printf.hpp"
@@ -27,6 +26,10 @@
 
 namespace {
 /* ----------------- 定数 ----------------------*/
+// 足回り
+constexpr float LINER_VELOCITY_MAX   = 4.0f;
+constexpr float ANGULAR_VELOCITY_MAX = 4.5f;
+// ベルト直動
 constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 8.0f;
 constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 2.0f;
 constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 4.0f;
@@ -35,13 +38,13 @@ constexpr float BELT_LAUNCHER_RELOAD_ANGLE_ADJUST = 0.9690f;
 constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA =
     -(float)M_PI * 2.0f / 3.0f * BELT_LAUNCHER_RELOAD_ANGLE_ADJUST;
 constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS = 2000;
-
+// バケツ用アーム
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
 constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.075f;  // [m]
-
+// 機械定数
 constexpr float M3508_GEAR_RATIO = 19.0f;
-
+// 処理定数
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
 constexpr uint32_t FEEDBACK_INTERVAL_MS         = 100;
 constexpr uint32_t ETHER_INIT_DELAY_MS          = 1000;
@@ -77,10 +80,6 @@ gn10_can::devices::LEDClient<LEDInformation> led_client(fdcan2_bus, 2);
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
 RobotEthernet ether;
-
-/* --------------------- ロボット司令 ----------------------------- */
-ConversionCommand conversion;
-robot_config::command_t last_command_{};
 
 /* ---------------------------- 運動学 ------------------------- */
 ThreeWheelOmni omni(0.4f, 0.13f / 2.0f);
@@ -169,13 +168,20 @@ void read_button_and_send_debug_pc_packet()
 
 /**
  * @brief ロボット司令より各アクチュエータに司令を送る
- *
- * @param command
  */
-void command_robot_drivers(const robot_config::command_t& command)
+void command_robot_drivers()
 {
     // 足回り
-    omni.convert(-command.x_vel, command.y_vel, command.angular_vel, 0.0f);
+    float x_vel =
+        std::clamp(static_cast<float>(teleop.analog.stick_left[0]) / INT8_MAX, -1.0f, 1.0f) *
+        LINER_VELOCITY_MAX;
+    float y_vel =
+        std::clamp(static_cast<float>(teleop.analog.stick_left[1]) / INT8_MAX, -1.0f, 1.0f) *
+        LINER_VELOCITY_MAX;
+    float angular_vel =
+        std::clamp(static_cast<float>(teleop.analog.stick_right[0]) / INT8_MAX, -1.0f, 1.0f) *
+        ANGULAR_VELOCITY_MAX;
+    omni.convert(-x_vel, y_vel, angular_vel, 0.0f);
     float front, right, left;
     omni.getWheelAngularVelocity(&front, &left, &right);
     std::array<float, 4> wheel_targets{
@@ -203,11 +209,10 @@ void command_robot_drivers(const robot_config::command_t& command)
 
     // エア射出
     std::array<bool, 8> solenoid_targets{};
-    solenoid_targets[0] = command.air_launcher_for_flag;
-    solenoid_targets[1] = command.air_launcher_for_desk_r;
-    solenoid_targets[2] = command.air_launcher_for_desk_l;
-    if (command.air_launcher_for_desk_l || command.air_launcher_for_desk_r ||
-        command.air_launcher_for_flag) {
+    solenoid_targets[0] = teleop.buttons.left_up;     // 旗
+    solenoid_targets[1] = teleop.buttons.left_right;  // 机右
+    solenoid_targets[2] = teleop.buttons.left_left;   // 机左
+    if (solenoid_targets[0] || solenoid_targets[1] || solenoid_targets[2]) {
         led_info.air_injection = true;
     } else {
         led_info.air_injection = false;
@@ -226,7 +231,6 @@ void command_robot_drivers(const robot_config::command_t& command)
     // CAN通信
     esc_arm_hold_and_loading.set_targets(arm_hold_and_loading_target.data());
     dc_arm_hight.set_target(arm_hight_target);
-    last_command_ = command;
 }
 
 }  // namespace
@@ -287,16 +291,6 @@ void setup()
     // Initialize Ethernet
     ether.init();
 
-    // controller command setup
-    conversion.set_belt_vel_init(0.3f);
-    conversion.set_belt_vel_adjust_value(0.005f);
-
-    conversion.set_bucket_hight_value(100);
-    conversion.set_bucket_limit_value(11000, 0);
-
-    conversion.set_wheel_max_vel(4.0f);
-    conversion.set_angular_max_vel(4.5f);
-
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
     bucket_arm.set_hold_force_by_current(1.0f);
     bucket_arm.set_release_force_by_current(1.5f);
@@ -317,9 +311,7 @@ void loop()
 {
     // 指令値取得
     if (ether.receive_teleop(teleop)) {
-        robot_config::command_t command;
-        command = conversion.conversion(teleop);
-        command_robot_drivers(command);
+        command_robot_drivers();
     }
     // フィードバック処理
     std::array<float, 4> wheel_feedbacks{};
