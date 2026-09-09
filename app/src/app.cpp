@@ -7,6 +7,7 @@
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/esc_hub_client.hpp"
 #include "gn10_can/devices/launcher_client.hpp"
+#include "gn10_can/devices/led_client.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_can/devices/power_manager_client.hpp"
 #include "gn10_can/devices/robot_control_hub_server.hpp"
@@ -68,6 +69,7 @@ gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
 gn10_can::devices::LauncherClient belt_launcher_client(fdcan3_bus, 0);
+gn10_can::devices::LEDClient<robot_config::feedback_t> led_client(fdcan2_bus, 2);
 
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
@@ -348,7 +350,7 @@ void loop()
         robot_feedback.logic_battery_voltages[3] = voltages[3];
     }
 
-    read_button_and_send_debug_pc_packet();
+    led_client.send_display_info(robot_feedback);
     periodic_feedback();
     last_teleop = teleop;
 
