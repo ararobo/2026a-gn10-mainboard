@@ -7,6 +7,7 @@
 #include "gn10_can/core/can_bus.hpp"
 #include "gn10_can/devices/esc_hub_client.hpp"
 #include "gn10_can/devices/launcher_client.hpp"
+#include "gn10_can/devices/led_client.hpp"
 #include "gn10_can/devices/motor_driver_client.hpp"
 #include "gn10_can/devices/power_manager_client.hpp"
 #include "gn10_can/devices/robot_control_hub_server.hpp"
@@ -15,6 +16,7 @@
 #include "app/belt_launcher_controller.hpp"
 #include "app/bucket_arm_controller.hpp"
 #include "app/conversion_command.hpp"
+#include "app/led_information.hpp"
 #include "app/robot_ethernet.hpp"
 #include "app/serial_printf.hpp"
 #include "app/three_wheel_omni.hpp"
@@ -68,6 +70,7 @@ gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
 gn10_can::devices::LauncherClient belt_launcher_client(fdcan3_bus, 0);
+gn10_can::devices::LEDClient<LEDInformation> led_client(fdcan2_bus, 2);
 
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
@@ -103,6 +106,9 @@ robot_config::teleop_t last_teleop{};
 robot_config::debug_pc_t prev_debug_pc{};
 robot_config::feedback_t robot_feedback{};
 
+/* ----------------------- LED --------------------------*/
+LEDInformation led_info;
+
 /* ------------------ Lチカ ----------------------- */
 uint32_t heartbeat_last_toggle_time_ms = 0;
 /**
@@ -130,6 +136,7 @@ void periodic_feedback()
         if (ether.send_feedback_data(robot_feedback)) {
             robot_feedback.sequence++;
         }
+        led_client.send_display_info(led_info);
     }
 }
 
@@ -182,6 +189,7 @@ void command_robot_drivers(const robot_config::command_t& command)
         teleop.buttons.right_up && !last_teleop.buttons.right_up,
         teleop.buttons.right_down && !last_teleop.buttons.right_down
     );
+    led_info.belt_velocity = belt_launcher_controller.get_target_velocity();
     float belt_launcher_target_vel{};
     if (!teleop.buttons.left_down) {
         if (teleop.buttons.right_right && !last_teleop.buttons.right_right) {
@@ -196,6 +204,12 @@ void command_robot_drivers(const robot_config::command_t& command)
     solenoid_targets[0] = command.air_launcher_for_flag;
     solenoid_targets[1] = command.air_launcher_for_desk_r;
     solenoid_targets[2] = command.air_launcher_for_desk_l;
+    if (command.air_launcher_for_desk_l || command.air_launcher_for_desk_r ||
+        command.air_launcher_for_flag) {
+        led_info.air_injection = true;
+    } else {
+        led_info.air_injection = false;
+    }
     solenoid.set_target(solenoid_targets);
     // バケツ用アーム
     float arm_hight_target = 0.0f;
@@ -314,6 +328,11 @@ void loop()
     float belt_launcher_initial_angle{};
     if (belt_launcher_client.get_initial_point(belt_launcher_initial_angle)) {
         belt_launcher_controller.set_initial_point(HAL_GetTick());
+        led_info.belt_initialization = true;
+    }
+    float belt_release_point_velocity{};
+    if (belt_launcher_client.get_release_point(belt_release_point_velocity)) {
+        led_info.belt_initialization = false;
     }
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
     }
@@ -347,8 +366,10 @@ void loop()
         robot_feedback.logic_battery_voltages[2] = voltages[2];
         robot_feedback.logic_battery_voltages[3] = voltages[3];
     }
+    led_info.battery_voltage[0] = robot_feedback.logic_battery_voltages[0];
+    led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
+    led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
 
-    read_button_and_send_debug_pc_packet();
     periodic_feedback();
     last_teleop = teleop;
 
