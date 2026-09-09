@@ -22,8 +22,8 @@ float BucketArmController::height_motor_output(bool up, bool down) const
 float BucketArmController::hold_motor_output(bool hold) const
 {
     if (hold) {
-        return hold_current_;
+        return -hold_current_;
     } else {
-        return -release_current_;
+        return release_current_;
     }
 }

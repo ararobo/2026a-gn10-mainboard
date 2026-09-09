@@ -161,7 +161,7 @@ void reload_cloth()
         motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
 
         esc_arm_hold_and_loading.set_init(2, motor_config_loading);
-        esc_arm_hold_and_loading.set_gains(2, -2.0f, 0.0f, 0.0f, 0.0f);
+        esc_arm_hold_and_loading.set_gains(2, -1.5f, 0.0f, 0.0f, 0.0f);
     }
     reload_count++;
     reload_success = false;
@@ -266,7 +266,6 @@ void setup()
         esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
     }
     esc_arm_hold_and_loading.set_init(1, motor_config_hand);
-    esc_arm_hold_and_loading.set_gains(1, 0.001f, 0.0f, 0.0f, 0.0f);
 
     dc_arm_hight.set_init(motor_config_arm_hight);
     solenoid.set_init();
@@ -287,8 +286,8 @@ void setup()
     conversion.set_angular_max_vel(4.5f);
 
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(0.5f);
-    bucket_arm.set_release_force_by_current(0.25f);
+    bucket_arm.set_hold_force_by_current(1.0f);
+    bucket_arm.set_release_force_by_current(1.5f);
 
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
