@@ -361,9 +361,8 @@ void loop()
     }
     std::array<float, 4> voltages;
     if (logic_power_manager.get_new_voltages(voltages)) {
+        robot_feedback.logic_battery_voltages[0] = voltages[0];
         robot_feedback.logic_battery_voltages[1] = voltages[1];
-        robot_feedback.logic_battery_voltages[2] = voltages[2];
-        robot_feedback.logic_battery_voltages[3] = voltages[3];
     }
     led_info.battery_voltage[0] = robot_feedback.logic_battery_voltages[0];
     led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
