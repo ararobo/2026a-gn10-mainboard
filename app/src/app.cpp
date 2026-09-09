@@ -15,7 +15,6 @@
 // gn10-mainboard
 #include "app/belt_launcher_controller.hpp"
 #include "app/bucket_arm_controller.hpp"
-#include "app/conversion_command.hpp"
 #include "app/led_information.hpp"
 #include "app/robot_ethernet.hpp"
 #include "app/serial_printf.hpp"
@@ -27,21 +26,29 @@
 
 namespace {
 /* ----------------- 定数 ----------------------*/
+// 足回り
+constexpr float LINER_VELOCITY_MAX   = 4.0f;
+constexpr float ANGULAR_VELOCITY_MAX = 4.5f;
+constexpr float WHEEL_PID_GAINS[3]   = {0.05f, 0.0f, 0.0f};
+// ベルト直動
 constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 8.0f;
 constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 2.0f;
 constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 4.0f;
 constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.5f;
-constexpr float BELT_LAUNCHER_RELOAD_ANGLE_ADJUST = 0.9690f;
-constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA =
-    -(float)M_PI * 2.0f / 3.0f * BELT_LAUNCHER_RELOAD_ANGLE_ADJUST;
-constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS = 2000;
-
+// 装填機構
+constexpr float RELOAD_ANGLE_ADJUST = 0.9690f;
+constexpr float RELOAD_ANGLE_DELTA  = -(float)M_PI * 2.0f / 3.0f * RELOAD_ANGLE_ADJUST;
+constexpr uint32_t RELOAD_DELAY_MS  = 2000;
+constexpr float RELOAD_PID_GAINS[3] = {-1.5f, 0.0f, 0.0f};
+// バケツ用アーム
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
 constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.075f;  // [m]
-
+constexpr float BUCKET_ARM_HOLD_FORCE           = 1.0f;    // [A]
+constexpr float BUCKET_ARM_RELEASE_FORCE        = 1.0f;    // [A]
+// 機械定数
 constexpr float M3508_GEAR_RATIO = 19.0f;
-
+// 処理定数
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
 constexpr uint32_t FEEDBACK_INTERVAL_MS         = 100;
 constexpr uint32_t ETHER_INIT_DELAY_MS          = 1000;
@@ -51,7 +58,7 @@ gn10_can::devices::MotorConfig motor_config_wheel;
 gn10_can::devices::MotorConfig motor_config_hand;
 gn10_can::devices::MotorConfig motor_config_belt;
 gn10_can::devices::MotorConfig motor_config_loading;
-gn10_can::devices::MotorConfig motor_config_arm_hight;
+gn10_can::devices::MotorConfig motor_config_arm_height;
 gn10_can::devices::power_manager::Config drive_power_manager_config;
 gn10_can::devices::power_manager::Config logic_power_manager_config;
 // CAN Drivers
@@ -68,7 +75,7 @@ gn10_can::devices::RobotControlHubServer<robot_config::command_t, robot_config::
     robot_control_hub(fdcan2_bus, 0);
 gn10_can::devices::ESCHubClient esc_wheel(fdcan3_bus, 1);
 gn10_can::devices::ESCHubClient esc_arm_hold_and_loading(fdcan3_bus, 2);
-gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
+gn10_can::devices::MotorDriverClient dc_arm_height(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
 gn10_can::devices::LauncherClient belt_launcher_client(fdcan3_bus, 0);
@@ -77,10 +84,6 @@ gn10_can::devices::LEDClient<LEDInformation> led_client(fdcan2_bus, 2);
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
 RobotEthernet ether;
-
-/* --------------------- ロボット司令 ----------------------------- */
-ConversionCommand conversion;
-robot_config::command_t last_command_{};
 
 /* ---------------------------- 運動学 ------------------------- */
 ThreeWheelOmni omni(0.4f, 0.13f / 2.0f);
@@ -95,7 +98,7 @@ BeltLauncherController belt_launcher_controller(
 );
 
 // バケツアーム
-bool dc_arm_hight_encoder_initialized = false;
+bool dc_arm_height_encoder_initialized = false;
 BucketArmController bucket_arm(
     BUCKET_ARM_HEIGHT_PULLEY_RADIUS, BUCKET_ARM_HEIGHT_MAX, BUCKET_ARM_HEIGHT_MIN
 );
@@ -169,13 +172,20 @@ void read_button_and_send_debug_pc_packet()
 
 /**
  * @brief ロボット司令より各アクチュエータに司令を送る
- *
- * @param command
  */
-void command_robot_drivers(const robot_config::command_t& command)
+void command_robot_drivers()
 {
     // 足回り
-    omni.convert(-command.x_vel, command.y_vel, command.angular_vel, 0.0f);
+    float x_vel =
+        std::clamp(static_cast<float>(teleop.analog.stick_left[0]) / INT8_MAX, -1.0f, 1.0f) *
+        LINER_VELOCITY_MAX;
+    float y_vel =
+        std::clamp(static_cast<float>(teleop.analog.stick_left[1]) / INT8_MAX, -1.0f, 1.0f) *
+        LINER_VELOCITY_MAX;
+    float angular_vel =
+        std::clamp(static_cast<float>(teleop.analog.stick_right[0]) / INT8_MAX, -1.0f, 1.0f) *
+        ANGULAR_VELOCITY_MAX;
+    omni.convert(-x_vel, y_vel, angular_vel, 0.0f);
     float front, right, left;
     omni.getWheelAngularVelocity(&front, &left, &right);
     std::array<float, 4> wheel_targets{
@@ -203,20 +213,19 @@ void command_robot_drivers(const robot_config::command_t& command)
 
     // エア射出
     std::array<bool, 8> solenoid_targets{};
-    solenoid_targets[0] = command.air_launcher_for_flag;
-    solenoid_targets[1] = command.air_launcher_for_desk_r;
-    solenoid_targets[2] = command.air_launcher_for_desk_l;
-    if (command.air_launcher_for_desk_l || command.air_launcher_for_desk_r ||
-        command.air_launcher_for_flag) {
+    solenoid_targets[0] = teleop.buttons.left_up;     // 旗
+    solenoid_targets[1] = teleop.buttons.left_right;  // 机右
+    solenoid_targets[2] = teleop.buttons.left_left;   // 机左
+    if (solenoid_targets[0] || solenoid_targets[1] || solenoid_targets[2]) {
         led_info.air_injection = true;
     } else {
         led_info.air_injection = false;
     }
     solenoid.set_target(solenoid_targets);
     // バケツ用アーム
-    float arm_hight_target = 0.0f;
+    float arm_height_target = 0.0f;
     if (teleop.buttons.left_down) {
-        arm_hight_target =
+        arm_height_target =
             bucket_arm.height_motor_output(teleop.buttons.right_up, teleop.buttons.right_down);
         arm_hold_and_loading_target[1] = bucket_arm.hold_motor_output(teleop.buttons.right_right);
     }
@@ -225,8 +234,67 @@ void command_robot_drivers(const robot_config::command_t& command)
     }
     // CAN通信
     esc_arm_hold_and_loading.set_targets(arm_hold_and_loading_target.data());
-    dc_arm_hight.set_target(arm_hight_target);
-    last_command_ = command;
+    dc_arm_height.set_target(arm_height_target);
+}
+
+void receive_and_process_feedbacks()
+{
+    std::array<float, 4> wheel_feedbacks{};
+    if (esc_wheel.get_feedbacks(wheel_feedbacks.data())) {
+        robot_feedback.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
+        robot_feedback.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
+        robot_feedback.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
+    }
+    float belt_launcher_feedback_vel{};
+    if (belt_launcher_client.get_velocity_feedback(belt_launcher_feedback_vel)) {
+        robot_feedback.belt_launcher_velocity = belt_launcher_feedback_vel;
+    }
+    float belt_launcher_initial_angle{};
+    if (belt_launcher_client.get_initial_point(belt_launcher_initial_angle)) {
+        belt_launcher_controller.set_initial_point(HAL_GetTick());
+        led_info.belt_initialization = true;
+    }
+    float belt_release_point_velocity{};
+    if (belt_launcher_client.get_release_point(belt_release_point_velocity)) {
+        led_info.belt_initialization = false;
+    }
+    std::array<float, 4> loading_feedback = {};
+    if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
+        robot_feedback.loading_belt_angle = loading_feedback[2];
+    }
+    float latest_arm_height_motor_angle = -dc_arm_height.feedback_value();  // 降下方向を+とする
+    bucket_arm.set_height_motor_angle(latest_arm_height_motor_angle);
+    // ゼロ点合わせが済んだらエンコーダーの値から高さを計算してフィードバックに代入
+    if (dc_arm_height_encoder_initialized) {
+        robot_feedback.bucket_arm_height =
+            bucket_arm.angle_to_height(latest_arm_height_motor_angle);
+    } else {  // ゼロ点取りが済んでいない場合、リミットスイッチで最高点を設定する
+        uint8_t dc_arm_height_limit_sw = dc_arm_height.limit_switches();
+        if ((dc_arm_height_limit_sw & 0b1)) {
+            dc_arm_height.set_init(motor_config_arm_height);
+            dc_arm_height_encoder_initialized = true;
+        }
+        robot_feedback.bucket_arm_height = 0.0f;  // ゼロ点があっていない間は0とする。
+    }
+
+    gn10_can::devices::power_manager::Sensor drive_power_sensor{};
+    if (drive_power_manager.get_new_sensor(drive_power_sensor)) {
+        robot_feedback.drive_battery_voltages = drive_power_sensor.voltage;
+        robot_feedback.drive_current          = drive_power_sensor.current;
+    }
+    gn10_can::devices::power_manager::Status drive_power_status{};
+    if (drive_power_manager.get_new_status(drive_power_status)) {
+        robot_feedback.emergency_stop_enabled = drive_power_status.emergency_stop_enabled;
+        robot_feedback.over_current           = drive_power_status.over_current;
+    }
+    std::array<float, 4> voltages;
+    if (logic_power_manager.get_new_voltages(voltages)) {
+        robot_feedback.logic_battery_voltages[0] = voltages[0];
+        robot_feedback.logic_battery_voltages[1] = voltages[1];
+    }
+    led_info.battery_voltage[0] = robot_feedback.logic_battery_voltages[0];
+    led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
+    led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
 }
 
 }  // namespace
@@ -254,11 +322,11 @@ void setup()
 
     motor_config_belt.set_motor_type(gn10_can::devices::MotorType::VESC);
 
-    motor_config_arm_hight.set_max_duty_ratio(0.75f);
-    motor_config_arm_hight.set_reverse_limit_switch(true, 0);
-    motor_config_arm_hight.set_motor_type(gn10_can::devices::MotorType::DC);
-    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
-    motor_config_arm_hight.set_feedback_cycle(10);
+    motor_config_arm_height.set_max_duty_ratio(0.75f);
+    motor_config_arm_height.set_reverse_limit_switch(true, 0);
+    motor_config_arm_height.set_motor_type(gn10_can::devices::MotorType::DC);
+    motor_config_arm_height.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_arm_height.set_feedback_cycle(10);
 
     // Other device configuration
     drive_power_manager_config.sensor_rate_ms            = 100;
@@ -269,7 +337,7 @@ void setup()
     // Initialize devices on the network
     for (uint8_t i = 0; i < 4; i++) {
         esc_wheel.set_init(i, motor_config_wheel);
-        esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
+        esc_wheel.set_gains(i, WHEEL_PID_GAINS[0], WHEEL_PID_GAINS[1], WHEEL_PID_GAINS[2], 0.0f);
     }
     esc_arm_hold_and_loading.set_init(1, motor_config_hand);
 
@@ -277,9 +345,11 @@ void setup()
     motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
     motor_config_loading.set_max_duty_ratio(10.0f);
     esc_arm_hold_and_loading.set_init(2, motor_config_loading);
-    esc_arm_hold_and_loading.set_gains(2, -1.5f, 0.0f, 0.0f, 0.0f);
+    esc_arm_hold_and_loading.set_gains(
+        2, RELOAD_PID_GAINS[0], RELOAD_PID_GAINS[1], RELOAD_PID_GAINS[2], 0.0f
+    );
 
-    dc_arm_hight.set_init(motor_config_arm_hight);
+    dc_arm_height.set_init(motor_config_arm_height);
     solenoid.set_init();
     drive_power_manager.set_init(drive_power_manager_config);
     logic_power_manager.set_init(logic_power_manager_config);
@@ -287,28 +357,17 @@ void setup()
     // Initialize Ethernet
     ether.init();
 
-    // controller command setup
-    conversion.set_belt_vel_init(0.3f);
-    conversion.set_belt_vel_adjust_value(0.005f);
-
-    conversion.set_bucket_hight_value(100);
-    conversion.set_bucket_limit_value(11000, 0);
-
-    conversion.set_wheel_max_vel(4.0f);
-    conversion.set_angular_max_vel(4.5f);
-
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(1.0f);
-    bucket_arm.set_release_force_by_current(1.5f);
+    bucket_arm.set_hold_force_by_current(BUCKET_ARM_HOLD_FORCE);
+    bucket_arm.set_release_force_by_current(BUCKET_ARM_RELEASE_FORCE);
 
     belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
     belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
-    belt_launcher_controller.set_reload_delay_ms(BELT_LAUNCHER_RELOAD_DELAY_MS);
-    belt_launcher_controller.set_reload_angle_delta(BELT_LAUNCHER_RELOAD_ANGLE_DELTA);
+    belt_launcher_controller.set_reload_delay_ms(RELOAD_DELAY_MS);
+    belt_launcher_controller.set_reload_angle_delta(RELOAD_ANGLE_DELTA);
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
-std::array<float, 4> loading_feedback = {};
 
 /**
  * @brief Run one control cycle and update status heartbeat LED.
@@ -317,67 +376,12 @@ void loop()
 {
     // 指令値取得
     if (ether.receive_teleop(teleop)) {
-        robot_config::command_t command;
-        command = conversion.conversion(teleop);
-        command_robot_drivers(command);
+        command_robot_drivers();
     }
     // フィードバック処理
-    std::array<float, 4> wheel_feedbacks{};
-    if (esc_wheel.get_feedbacks(wheel_feedbacks.data())) {
-        robot_feedback.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
-        robot_feedback.wheel_angular_velocity[1] = wheel_feedbacks[1];  // left
-        robot_feedback.wheel_angular_velocity[2] = wheel_feedbacks[2];  // right
-    }
-    float belt_launcher_feedback_vel{};
-    if (belt_launcher_client.get_velocity_feedback(belt_launcher_feedback_vel)) {
-        robot_feedback.belt_launcher_velocity = belt_launcher_feedback_vel;
-    }
-    float belt_launcher_initial_angle{};
-    if (belt_launcher_client.get_initial_point(belt_launcher_initial_angle)) {
-        belt_launcher_controller.set_initial_point(HAL_GetTick());
-        led_info.belt_initialization = true;
-    }
-    float belt_release_point_velocity{};
-    if (belt_launcher_client.get_release_point(belt_release_point_velocity)) {
-        led_info.belt_initialization = false;
-    }
-    if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
-    }
-    float latest_arm_hight_motor_angle = -dc_arm_hight.feedback_value();  // 降下方向を+とする
-    bucket_arm.set_height_motor_angle(latest_arm_hight_motor_angle);
-    // ゼロ点合わせが済んだらエンコーダーの値から高さを計算してフィードバックに代入
-    if (dc_arm_hight_encoder_initialized) {
-        robot_feedback.bucket_arm_hight = bucket_arm.angle_to_height(latest_arm_hight_motor_angle);
-    } else {  // ゼロ点取りが済んでいない場合、リミットスイッチで最高点を設定する
-        uint8_t dc_arm_hight_limit_sw = dc_arm_hight.limit_switches();
-        if ((dc_arm_hight_limit_sw & 0b1)) {
-            dc_arm_hight.set_init(motor_config_arm_hight);
-            dc_arm_hight_encoder_initialized = true;
-        }
-        robot_feedback.bucket_arm_hight = 0.0f;  // ゼロ点があっていない間は0とする。
-    }
-
-    gn10_can::devices::power_manager::Sensor drive_power_sensor{};
-    if (drive_power_manager.get_new_sensor(drive_power_sensor)) {
-        robot_feedback.drive_battery_voltages = drive_power_sensor.voltage;
-        robot_feedback.drive_current          = drive_power_sensor.current;
-    }
-    gn10_can::devices::power_manager::Status drive_power_status{};
-    if (drive_power_manager.get_new_status(drive_power_status)) {
-        robot_feedback.emergency_stop_enabled = drive_power_status.emergency_stop_enabled;
-        robot_feedback.over_current           = drive_power_status.over_current;
-    }
-    std::array<float, 4> voltages;
-    if (logic_power_manager.get_new_voltages(voltages)) {
-        robot_feedback.logic_battery_voltages[1] = voltages[1];
-        robot_feedback.logic_battery_voltages[2] = voltages[2];
-        robot_feedback.logic_battery_voltages[3] = voltages[3];
-    }
-    led_info.battery_voltage[0] = robot_feedback.logic_battery_voltages[0];
-    led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
-    led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
-
+    receive_and_process_feedbacks();
     periodic_feedback();
+    read_button_and_send_debug_pc_packet();
     last_teleop = teleop;
 
     // Basic System Process
