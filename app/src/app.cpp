@@ -29,6 +29,7 @@ namespace {
 // 足回り
 constexpr float LINER_VELOCITY_MAX   = 4.0f;
 constexpr float ANGULAR_VELOCITY_MAX = 4.5f;
+constexpr float WHEEL_PID_GAINS[3]   = {0.05f, 0.0f, 0.0f};
 // ベルト直動
 constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 8.0f;
 constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 2.0f;
@@ -43,6 +44,8 @@ constexpr float RELOAD_PID_GAINS[3] = {-1.5f, 0.0f, 0.0f};
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
 constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.075f;  // [m]
+constexpr float BUCKET_ARM_HOLD_FORCE           = 1.0;     // [A]
+constexpr float BUCKET_ARM_RELEASE_FORCE        = 1.0;     // [A]
 // 機械定数
 constexpr float M3508_GEAR_RATIO = 19.0f;
 // 処理定数
@@ -331,7 +334,7 @@ void setup()
     // Initialize devices on the network
     for (uint8_t i = 0; i < 4; i++) {
         esc_wheel.set_init(i, motor_config_wheel);
-        esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
+        esc_wheel.set_gains(i, WHEEL_PID_GAINS[0], WHEEL_PID_GAINS[1], WHEEL_PID_GAINS[2], 0.0f);
     }
     esc_arm_hold_and_loading.set_init(1, motor_config_hand);
 
@@ -352,8 +355,8 @@ void setup()
     ether.init();
 
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(1.0f);
-    bucket_arm.set_release_force_by_current(1.5f);
+    bucket_arm.set_hold_force_by_current(BUCKET_ARM_HOLD_FORCE);
+    bucket_arm.set_release_force_by_current(BUCKET_ARM_RELEASE_FORCE);
 
     belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
     belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
