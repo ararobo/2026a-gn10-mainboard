@@ -110,6 +110,7 @@ robot_config::teleop_t last_teleop{};
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
 robot_config::feedback_t robot_feedback{};
+robot_config::command_t robot_command{};
 
 /* ----------------------- LED --------------------------*/
 LEDInformation led_info;
@@ -378,6 +379,9 @@ void loop()
     if (ether.receive_teleop(teleop)) {
         command_robot_drivers();
     }
+    if (ether.receive_operation_data(robot_command)) {
+    }
+
     // フィードバック処理
     receive_and_process_feedbacks();
     periodic_feedback();

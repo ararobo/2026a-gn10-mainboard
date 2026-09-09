@@ -51,7 +51,13 @@ constexpr uint8_t teleop[]    = {192, 168, 2, 2};
 struct command_t {
     // 識別ヘッダー 1byte
     uint8_t header;
-
+    uint8_t reserved[3];
+    float move_bucket_angle_yaw_rad;
+    float bucket1_angle_yaw_rad;
+    float bucket2_angle_yaw_rad;
+    float bucket3_angle_yaw_rad;
+    float flag_angle_yaw_rad;
+    float desk_angle_yaw_rad;
 } __attribute__((__packed__));
 
 union command_u {
@@ -59,7 +65,7 @@ union command_u {
     uint8_t binary[sizeof(command_t)];  // 送信バイト配列
 } __attribute__((__packed__));
 
-static_assert(sizeof(command_t) == 1);
+static_assert(sizeof(command_t) == 28);
 
 /**
  * @brief ロボットのセンサ値などのフィードバック
