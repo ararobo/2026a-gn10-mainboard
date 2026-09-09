@@ -203,9 +203,10 @@ void command_robot_drivers()
     );
     led_info.belt_velocity = belt_launcher_controller.get_target_velocity();
     float belt_launcher_target_vel{};
+    // 左下ボタンが押されていない間はベルト直動操作モード
     if (!teleop.buttons.left_down) {
-        if (teleop.buttons.right_right && !last_teleop.buttons.right_right) {
-            if (belt_launcher_controller.fire(belt_launcher_target_vel)) {
+        if (teleop.buttons.right_right && !last_teleop.buttons.right_right) {  // 射出操作
+            if (belt_launcher_controller.fire(belt_launcher_target_vel)) {     // 射出できるかどうか
                 belt_launcher_client.send_fire_command(belt_launcher_target_vel);
             }
         }
@@ -222,16 +223,21 @@ void command_robot_drivers()
         led_info.air_injection = false;
     }
     solenoid.set_target(solenoid_targets);
+
     // バケツ用アーム
     float arm_height_target = 0.0f;
     if (teleop.buttons.left_down) {
         arm_height_target =
             bucket_arm.height_motor_output(teleop.buttons.right_up, teleop.buttons.right_down);
         arm_hold_and_loading_target[1] = bucket_arm.hold_motor_output(teleop.buttons.right_right);
+    } else {
+        arm_hold_and_loading_target[1] = 0.0f;
     }
+
     // 装填
     if (belt_launcher_controller.load_a_cloth(arm_hold_and_loading_target[2], HAL_GetTick())) {
     }
+
     // CAN通信
     esc_arm_hold_and_loading.set_targets(arm_hold_and_loading_target.data());
     dc_arm_height.set_target(arm_height_target);
