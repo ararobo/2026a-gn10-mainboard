@@ -306,6 +306,8 @@ void stop_all_actuators()
     esc_wheel.set_targets(esc_target_zero.data());
     esc_arm_hold_and_loading.set_targets(esc_target_zero.data());
     dc_arm_height.set_target(0.0f);
+    std::array<bool, 8> solenoid_target_zero{};
+    solenoid.set_target(solenoid_target_zero);
 }
 
 }  // namespace
