@@ -44,8 +44,8 @@ constexpr float RELOAD_PID_GAINS[3] = {-1.5f, 0.0f, 0.0f};
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
 constexpr float BUCKET_ARM_HEIGHT_MIN           = 0.075f;  // [m]
-constexpr float BUCKET_ARM_HOLD_FORCE           = 1.0;     // [A]
-constexpr float BUCKET_ARM_RELEASE_FORCE        = 1.0;     // [A]
+constexpr float BUCKET_ARM_HOLD_FORCE           = 1.0f;    // [A]
+constexpr float BUCKET_ARM_RELEASE_FORCE        = 1.0f;    // [A]
 // 機械定数
 constexpr float M3508_GEAR_RATIO = 19.0f;
 // 処理定数
