@@ -269,8 +269,8 @@ void receive_and_process_feedbacks()
         robot_feedback.bucket_arm_height =
             bucket_arm.angle_to_height(latest_arm_height_motor_angle);
     } else {  // ゼロ点取りが済んでいない場合、リミットスイッチで最高点を設定する
-        uint8_t dc_arm_hight_limit_sw = dc_arm_height.limit_switches();
-        if ((dc_arm_hight_limit_sw & 0b1)) {
+        uint8_t dc_arm_height_limit_sw = dc_arm_height.limit_switches();
+        if ((dc_arm_height_limit_sw & 0b1)) {
             dc_arm_height.set_init(motor_config_arm_height);
             dc_arm_height_encoder_initialized = true;
         }
