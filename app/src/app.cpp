@@ -34,10 +34,11 @@ constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 8.0f;
 constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 2.0f;
 constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 4.0f;
 constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.5f;
-constexpr float BELT_LAUNCHER_RELOAD_ANGLE_ADJUST = 0.9690f;
-constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA =
-    -(float)M_PI * 2.0f / 3.0f * BELT_LAUNCHER_RELOAD_ANGLE_ADJUST;
-constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS = 2000;
+// 装填機構
+constexpr float RELOAD_ANGLE_ADJUST = 0.9690f;
+constexpr float RELOAD_ANGLE_DELTA  = -(float)M_PI * 2.0f / 3.0f * RELOAD_ANGLE_ADJUST;
+constexpr uint32_t RELOAD_DELAY_MS  = 2000;
+constexpr float RELOAD_PID_GAINS[3] = {-1.5f, 0.0f, 0.0f};
 // バケツ用アーム
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
@@ -233,87 +234,8 @@ void command_robot_drivers()
     dc_arm_hight.set_target(arm_hight_target);
 }
 
-}  // namespace
-
-/**
- * @brief Initialize CAN and mainboard application state.
- */
-void setup()
+void receive_and_process_feedbacks()
 {
-    HAL_Delay(ETHER_INIT_DELAY_MS);
-
-    // CAN initialization
-    can1_driver.init();
-    fdcan2_driver.init();
-    fdcan3_driver.init();
-
-    // Motor configuration
-    motor_config_wheel.set_motor_type(gn10_can::devices::MotorType::C620);
-    motor_config_wheel.set_encoder_type(gn10_can::devices::EncoderType::InternalIncremental);
-    motor_config_wheel.set_max_duty_ratio(20.0f);
-    motor_config_wheel.set_accel_ratio(1.0f);
-
-    motor_config_hand.set_motor_type(gn10_can::devices::MotorType::C610);
-    motor_config_hand.set_encoder_type(gn10_can::devices::EncoderType::None);  // 電流制御
-
-    motor_config_belt.set_motor_type(gn10_can::devices::MotorType::VESC);
-
-    motor_config_arm_hight.set_max_duty_ratio(0.75f);
-    motor_config_arm_hight.set_reverse_limit_switch(true, 0);
-    motor_config_arm_hight.set_motor_type(gn10_can::devices::MotorType::DC);
-    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
-    motor_config_arm_hight.set_feedback_cycle(10);
-
-    // Other device configuration
-    drive_power_manager_config.sensor_rate_ms            = 100;
-    drive_power_manager_config.use_remote_emergency_stop = false;
-    logic_power_manager_config.sensor_rate_ms            = 100;
-    logic_power_manager_config.use_remote_emergency_stop = false;
-
-    // Initialize devices on the network
-    for (uint8_t i = 0; i < 4; i++) {
-        esc_wheel.set_init(i, motor_config_wheel);
-        esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
-    }
-    esc_arm_hold_and_loading.set_init(1, motor_config_hand);
-
-    motor_config_loading.set_motor_type(gn10_can::devices::MotorType::C610);
-    motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
-    motor_config_loading.set_max_duty_ratio(10.0f);
-    esc_arm_hold_and_loading.set_init(2, motor_config_loading);
-    esc_arm_hold_and_loading.set_gains(2, -1.5f, 0.0f, 0.0f, 0.0f);
-
-    dc_arm_hight.set_init(motor_config_arm_hight);
-    solenoid.set_init();
-    drive_power_manager.set_init(drive_power_manager_config);
-    logic_power_manager.set_init(logic_power_manager_config);
-
-    // Initialize Ethernet
-    ether.init();
-
-    bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(1.0f);
-    bucket_arm.set_release_force_by_current(1.5f);
-
-    belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
-    belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
-    belt_launcher_controller.set_reload_delay_ms(BELT_LAUNCHER_RELOAD_DELAY_MS);
-    belt_launcher_controller.set_reload_angle_delta(BELT_LAUNCHER_RELOAD_ANGLE_DELTA);
-    // System setup
-    heartbeat_last_toggle_time_ms = HAL_GetTick();
-}
-std::array<float, 4> loading_feedback = {};
-
-/**
- * @brief Run one control cycle and update status heartbeat LED.
- */
-void loop()
-{
-    // 指令値取得
-    if (ether.receive_teleop(teleop)) {
-        command_robot_drivers();
-    }
-    // フィードバック処理
     std::array<float, 4> wheel_feedbacks{};
     if (esc_wheel.get_feedbacks(wheel_feedbacks.data())) {
         robot_feedback.wheel_angular_velocity[0] = wheel_feedbacks[0];  // front
@@ -367,7 +289,92 @@ void loop()
     led_info.battery_voltage[0] = robot_feedback.logic_battery_voltages[0];
     led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
     led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
+}
 
+}  // namespace
+
+/**
+ * @brief Initialize CAN and mainboard application state.
+ */
+void setup()
+{
+    HAL_Delay(ETHER_INIT_DELAY_MS);
+
+    // CAN initialization
+    can1_driver.init();
+    fdcan2_driver.init();
+    fdcan3_driver.init();
+
+    // Motor configuration
+    motor_config_wheel.set_motor_type(gn10_can::devices::MotorType::C620);
+    motor_config_wheel.set_encoder_type(gn10_can::devices::EncoderType::InternalIncremental);
+    motor_config_wheel.set_max_duty_ratio(20.0f);
+    motor_config_wheel.set_accel_ratio(1.0f);
+
+    motor_config_hand.set_motor_type(gn10_can::devices::MotorType::C610);
+    motor_config_hand.set_encoder_type(gn10_can::devices::EncoderType::None);  // 電流制御
+
+    motor_config_belt.set_motor_type(gn10_can::devices::MotorType::VESC);
+
+    motor_config_arm_hight.set_max_duty_ratio(0.75f);
+    motor_config_arm_hight.set_reverse_limit_switch(true, 0);
+    motor_config_arm_hight.set_motor_type(gn10_can::devices::MotorType::DC);
+    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_arm_hight.set_feedback_cycle(10);
+
+    // Other device configuration
+    drive_power_manager_config.sensor_rate_ms            = 100;
+    drive_power_manager_config.use_remote_emergency_stop = false;
+    logic_power_manager_config.sensor_rate_ms            = 100;
+    logic_power_manager_config.use_remote_emergency_stop = false;
+
+    // Initialize devices on the network
+    for (uint8_t i = 0; i < 4; i++) {
+        esc_wheel.set_init(i, motor_config_wheel);
+        esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
+    }
+    esc_arm_hold_and_loading.set_init(1, motor_config_hand);
+
+    motor_config_loading.set_motor_type(gn10_can::devices::MotorType::C610);
+    motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_loading.set_max_duty_ratio(10.0f);
+    esc_arm_hold_and_loading.set_init(2, motor_config_loading);
+    esc_arm_hold_and_loading.set_gains(
+        2, RELOAD_PID_GAINS[0], RELOAD_PID_GAINS[1], RELOAD_PID_GAINS[2], 0.0f
+    );
+
+    dc_arm_hight.set_init(motor_config_arm_hight);
+    solenoid.set_init();
+    drive_power_manager.set_init(drive_power_manager_config);
+    logic_power_manager.set_init(logic_power_manager_config);
+
+    // Initialize Ethernet
+    ether.init();
+
+    bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
+    bucket_arm.set_hold_force_by_current(1.0f);
+    bucket_arm.set_release_force_by_current(1.5f);
+
+    belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
+    belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
+    belt_launcher_controller.set_reload_delay_ms(RELOAD_DELAY_MS);
+    belt_launcher_controller.set_reload_angle_delta(RELOAD_ANGLE_DELTA);
+    // System setup
+    heartbeat_last_toggle_time_ms = HAL_GetTick();
+}
+std::array<float, 4> loading_feedback = {};
+
+/**
+ * @brief Run one control cycle and update status heartbeat LED.
+ */
+void loop()
+{
+    // 指令値取得
+    if (ether.receive_teleop(teleop)) {
+        command_robot_drivers();
+    }
+    // フィードバック処理
+    receive_and_process_feedbacks();
     periodic_feedback();
     last_teleop = teleop;
 
