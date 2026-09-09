@@ -34,7 +34,7 @@ constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.5f;
 constexpr float BELT_LAUNCHER_RELOAD_ANGLE_ADJUST = 0.9690f;
 constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA =
     -(float)M_PI * 2.0f / 3.0f * BELT_LAUNCHER_RELOAD_ANGLE_ADJUST;
-constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS = 1500;
+constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS = 2000;
 
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
