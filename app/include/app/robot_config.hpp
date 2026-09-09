@@ -51,25 +51,7 @@ constexpr uint8_t teleop[]    = {192, 168, 2, 2};
 struct command_t {
     // 識別ヘッダー 1byte
     uint8_t header;
-    // 足回り 12byte
-    float x_vel;        //[m/s]
-    float y_vel;        //[m/s]
-    float angular_vel;  //[rad/s]
-    // バケツ用アーム 2byte
-    uint8_t bucket_arm_hight;  //[cm]
-    bool bucket_arm_hold;
-    // ベルト直動 6byte
-    float belt_vel;  //[m/s]
-    bool belt_throw;
-    bool belt_init;
-    // エアシリンダー射出 3byte
-    bool air_launcher_for_flag;
-    bool air_launcher_for_desk_r;
-    bool air_launcher_for_desk_l;
-    // 装填処理 1byte
-    bool loading;
-    // 予備 7byte
-    uint8_t reserved[7];
+
 } __attribute__((__packed__));
 
 union command_u {
@@ -77,7 +59,7 @@ union command_u {
     uint8_t binary[sizeof(command_t)];  // 送信バイト配列
 } __attribute__((__packed__));
 
-static_assert(sizeof(command_t) == 32);
+static_assert(sizeof(command_t) == 1);
 
 /**
  * @brief ロボットのセンサ値などのフィードバック
