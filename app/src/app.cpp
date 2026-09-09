@@ -70,7 +70,7 @@ gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
 gn10_can::devices::LauncherClient belt_launcher_client(fdcan3_bus, 0);
-gn10_can::devices::LEDClient<robot_config::feedback_t> led_client(fdcan2_bus, 2);
+gn10_can::devices::LEDClient<LEDInformation> led_client(fdcan2_bus, 2);
 
 /* ---------------------------- ethernet --------------------------*/
 // Ethernet
@@ -188,6 +188,7 @@ void command_robot_drivers(const robot_config::command_t& command)
         teleop.buttons.right_up && !last_teleop.buttons.right_up,
         teleop.buttons.right_down && !last_teleop.buttons.right_down
     );
+    led_info.belt_velocity = belt_launcher_controller.get_target_velocity();
     float belt_launcher_target_vel{};
     if (!teleop.buttons.left_down) {
         if (teleop.buttons.right_right && !last_teleop.buttons.right_right) {
@@ -196,7 +197,6 @@ void command_robot_drivers(const robot_config::command_t& command)
             }
         }
     }
-    led_info.belt_velocity = belt_launcher_target_vel;
 
     // エア射出
     std::array<bool, 8> solenoid_targets{};
@@ -369,7 +369,7 @@ void loop()
     led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
     led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
 
-    led_client.send_display_info(robot_feedback);
+    led_client.send_display_info(led_info);
     periodic_feedback();
     last_teleop = teleop;
 

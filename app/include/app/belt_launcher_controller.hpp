@@ -88,6 +88,16 @@ public:
     }
 
     /**
+     * @brief 現在設定されている目標射出速度を取得
+     *
+     * @return float 目標射出速度[m/s]
+     */
+    float get_target_velocity() const
+    {
+        return target_velocity_;
+    }
+
+    /**
      * @brief 射出するか
      *
      * @param target_velocity 目標射出速度[m/s]
