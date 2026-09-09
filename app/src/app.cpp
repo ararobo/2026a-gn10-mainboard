@@ -270,7 +270,6 @@ void setup()
         esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
     }
     esc_arm_hold_and_loading.set_init(1, motor_config_hand);
-    esc_arm_hold_and_loading.set_gains(1, 0.001f, 0.0f, 0.0f, 0.0f);
 
     dc_arm_hight.set_init(motor_config_arm_hight);
     solenoid.set_init();
@@ -291,8 +290,8 @@ void setup()
     conversion.set_angular_max_vel(4.5f);
 
     bucket_arm.set_height_adjustment_velocity_ratio(1.0f);
-    bucket_arm.set_hold_force_by_current(0.5f);
-    bucket_arm.set_release_force_by_current(0.25f);
+    bucket_arm.set_hold_force_by_current(1.0f);
+    bucket_arm.set_release_force_by_current(1.5f);
 
     belt_launcher_controller.set_default_velocity(BELT_LAUNCHER_DEFAULT_VELOCITY);
     belt_launcher_controller.set_velocity_adjustment_amount(BELT_LAUNCHER_ADJUSTMENT_VELOCITY);
