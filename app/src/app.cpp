@@ -136,6 +136,7 @@ void periodic_feedback()
         if (ether.send_feedback_data(robot_feedback)) {
             robot_feedback.sequence++;
         }
+        led_client.send_display_info(led_info);
     }
 }
 
@@ -369,7 +370,6 @@ void loop()
     led_info.battery_voltage[1] = robot_feedback.logic_battery_voltages[1];
     led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
 
-    led_client.send_display_info(led_info);
     periodic_feedback();
     last_teleop = teleop;
 
