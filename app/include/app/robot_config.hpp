@@ -51,13 +51,14 @@ constexpr uint8_t teleop[]    = {192, 168, 2, 2};
 struct command_t {
     // 識別ヘッダー 1byte
     uint8_t header;
-    uint8_t reserved[3];
-    float move_bucket_angle_yaw_rad;
-    float bucket1_angle_yaw_rad;
-    float bucket2_angle_yaw_rad;
-    float bucket3_angle_yaw_rad;
-    float flag_angle_yaw_rad;
-    float desk_angle_yaw_rad;
+    uint8_t reserved[2];
+    bool estimated_success;           // 推定成功
+    float move_bucket_angle_yaw_rad;  // ロボット座標系における移動バケツの水平角[rad]
+    float bucket1_angle_yaw_rad;      // ロボット座標系におけるバケツ1の水平角[rad]
+    float bucket2_angle_yaw_rad;      // ロボット座標系におけるバケツ2の水平角[rad]
+    float bucket3_angle_yaw_rad;      // ロボット座標系におけるバケツ3の水平角[rad]
+    float flag_angle_yaw_rad;         // ロボット座標系における旗の水平角[rad]
+    float desk_angle_yaw_rad;         // ロボット座標系における机の水平角[rad]
 } __attribute__((__packed__));
 
 union command_u {
