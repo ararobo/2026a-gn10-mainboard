@@ -30,9 +30,11 @@ namespace {
 constexpr float BELT_LAUNCHER_MAX_VELOCITY        = 8.0f;
 constexpr float BELT_LAUNCHER_MIN_VELOCITY        = 2.0f;
 constexpr float BELT_LAUNCHER_DEFAULT_VELOCITY    = 4.0f;
-constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.05f;
-constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA  = -(float)M_PI * 2.0f / 3.0f;
-constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS  = 2000;
+constexpr float BELT_LAUNCHER_ADJUSTMENT_VELOCITY = 0.5f;
+constexpr float BELT_LAUNCHER_RELOAD_ANGLE_ADJUST = 0.9690f;
+constexpr float BELT_LAUNCHER_RELOAD_ANGLE_DELTA =
+    -(float)M_PI * 2.0f / 3.0f * BELT_LAUNCHER_RELOAD_ANGLE_ADJUST;
+constexpr uint32_t BELT_LAUNCHER_RELOAD_DELAY_MS = 1500;
 
 constexpr float BUCKET_ARM_HEIGHT_PULLEY_RADIUS = 0.04f;   // [m]
 constexpr float BUCKET_ARM_HEIGHT_MAX           = 0.6f;    // [m]
@@ -270,6 +272,12 @@ void setup()
         esc_wheel.set_gains(i, 0.05f, 0.0f, 0.0f, 0.0f);
     }
     esc_arm_hold_and_loading.set_init(1, motor_config_hand);
+
+    motor_config_loading.set_motor_type(gn10_can::devices::MotorType::C610);
+    motor_config_loading.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_loading.set_max_duty_ratio(10.0f);
+    esc_arm_hold_and_loading.set_init(2, motor_config_loading);
+    esc_arm_hold_and_loading.set_gains(2, -1.5f, 0.0f, 0.0f, 0.0f);
 
     dc_arm_hight.set_init(motor_config_arm_hight);
     solenoid.set_init();
