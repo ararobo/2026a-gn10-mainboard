@@ -58,7 +58,7 @@ gn10_can::devices::MotorConfig motor_config_wheel;
 gn10_can::devices::MotorConfig motor_config_hand;
 gn10_can::devices::MotorConfig motor_config_belt;
 gn10_can::devices::MotorConfig motor_config_loading;
-gn10_can::devices::MotorConfig motor_config_arm_hight;
+gn10_can::devices::MotorConfig motor_config_arm_height;
 gn10_can::devices::power_manager::Config drive_power_manager_config;
 gn10_can::devices::power_manager::Config logic_power_manager_config;
 // CAN Drivers
@@ -75,7 +75,7 @@ gn10_can::devices::RobotControlHubServer<robot_config::command_t, robot_config::
     robot_control_hub(fdcan2_bus, 0);
 gn10_can::devices::ESCHubClient esc_wheel(fdcan3_bus, 1);
 gn10_can::devices::ESCHubClient esc_arm_hold_and_loading(fdcan3_bus, 2);
-gn10_can::devices::MotorDriverClient dc_arm_hight(can1_bus, 0);
+gn10_can::devices::MotorDriverClient dc_arm_height(can1_bus, 0);
 gn10_can::devices::PowerManagerClient drive_power_manager(fdcan2_bus, 0);
 gn10_can::devices::PowerManagerClient logic_power_manager(fdcan2_bus, 1);
 gn10_can::devices::LauncherClient belt_launcher_client(fdcan3_bus, 0);
@@ -98,7 +98,7 @@ BeltLauncherController belt_launcher_controller(
 );
 
 // バケツアーム
-bool dc_arm_hight_encoder_initialized = false;
+bool dc_arm_height_encoder_initialized = false;
 BucketArmController bucket_arm(
     BUCKET_ARM_HEIGHT_PULLEY_RADIUS, BUCKET_ARM_HEIGHT_MAX, BUCKET_ARM_HEIGHT_MIN
 );
@@ -223,9 +223,9 @@ void command_robot_drivers()
     }
     solenoid.set_target(solenoid_targets);
     // バケツ用アーム
-    float arm_hight_target = 0.0f;
+    float arm_height_target = 0.0f;
     if (teleop.buttons.left_down) {
-        arm_hight_target =
+        arm_height_target =
             bucket_arm.height_motor_output(teleop.buttons.right_up, teleop.buttons.right_down);
         arm_hold_and_loading_target[1] = bucket_arm.hold_motor_output(teleop.buttons.right_right);
     }
@@ -234,7 +234,7 @@ void command_robot_drivers()
     }
     // CAN通信
     esc_arm_hold_and_loading.set_targets(arm_hold_and_loading_target.data());
-    dc_arm_hight.set_target(arm_hight_target);
+    dc_arm_height.set_target(arm_height_target);
 }
 
 void receive_and_process_feedbacks()
@@ -262,18 +262,19 @@ void receive_and_process_feedbacks()
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
         robot_feedback.loading_belt_angle = loading_feedback[2];
     }
-    float latest_arm_hight_motor_angle = -dc_arm_hight.feedback_value();  // 降下方向を+とする
-    bucket_arm.set_height_motor_angle(latest_arm_hight_motor_angle);
+    float latest_arm_height_motor_angle = -dc_arm_height.feedback_value();  // 降下方向を+とする
+    bucket_arm.set_height_motor_angle(latest_arm_height_motor_angle);
     // ゼロ点合わせが済んだらエンコーダーの値から高さを計算してフィードバックに代入
-    if (dc_arm_hight_encoder_initialized) {
-        robot_feedback.bucket_arm_hight = bucket_arm.angle_to_height(latest_arm_hight_motor_angle);
+    if (dc_arm_height_encoder_initialized) {
+        robot_feedback.bucket_arm_height =
+            bucket_arm.angle_to_height(latest_arm_height_motor_angle);
     } else {  // ゼロ点取りが済んでいない場合、リミットスイッチで最高点を設定する
-        uint8_t dc_arm_hight_limit_sw = dc_arm_hight.limit_switches();
+        uint8_t dc_arm_hight_limit_sw = dc_arm_height.limit_switches();
         if ((dc_arm_hight_limit_sw & 0b1)) {
-            dc_arm_hight.set_init(motor_config_arm_hight);
-            dc_arm_hight_encoder_initialized = true;
+            dc_arm_height.set_init(motor_config_arm_height);
+            dc_arm_height_encoder_initialized = true;
         }
-        robot_feedback.bucket_arm_hight = 0.0f;  // ゼロ点があっていない間は0とする。
+        robot_feedback.bucket_arm_height = 0.0f;  // ゼロ点があっていない間は0とする。
     }
 
     gn10_can::devices::power_manager::Sensor drive_power_sensor{};
@@ -321,11 +322,11 @@ void setup()
 
     motor_config_belt.set_motor_type(gn10_can::devices::MotorType::VESC);
 
-    motor_config_arm_hight.set_max_duty_ratio(0.75f);
-    motor_config_arm_hight.set_reverse_limit_switch(true, 0);
-    motor_config_arm_hight.set_motor_type(gn10_can::devices::MotorType::DC);
-    motor_config_arm_hight.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
-    motor_config_arm_hight.set_feedback_cycle(10);
+    motor_config_arm_height.set_max_duty_ratio(0.75f);
+    motor_config_arm_height.set_reverse_limit_switch(true, 0);
+    motor_config_arm_height.set_motor_type(gn10_can::devices::MotorType::DC);
+    motor_config_arm_height.set_encoder_type(gn10_can::devices::EncoderType::IncrementalTotal);
+    motor_config_arm_height.set_feedback_cycle(10);
 
     // Other device configuration
     drive_power_manager_config.sensor_rate_ms            = 100;
@@ -348,7 +349,7 @@ void setup()
         2, RELOAD_PID_GAINS[0], RELOAD_PID_GAINS[1], RELOAD_PID_GAINS[2], 0.0f
     );
 
-    dc_arm_hight.set_init(motor_config_arm_hight);
+    dc_arm_height.set_init(motor_config_arm_height);
     solenoid.set_init();
     drive_power_manager.set_init(drive_power_manager_config);
     logic_power_manager.set_init(logic_power_manager_config);

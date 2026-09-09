@@ -96,7 +96,7 @@ struct feedback_t {
     float wheel_angular_velocity[3];  // 0:front 1:left 2:right
     float belt_launcher_velocity;     // [m/s]
     float loading_belt_angle;         // 装填機構のプーリー角度[rad]
-    float bucket_arm_hight;           // バケツアームの高さ[m]
+    float bucket_arm_height;          // バケツアームの高さ[m]
 } __attribute__((__packed__));
 
 union feedback_u {
