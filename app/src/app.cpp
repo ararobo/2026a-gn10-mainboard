@@ -258,7 +258,9 @@ void receive_and_process_feedbacks()
     if (belt_launcher_client.get_release_point(belt_release_point_velocity)) {
         led_info.belt_initialization = false;
     }
+    std::array<float, 4> loading_feedback = {};
     if (esc_arm_hold_and_loading.get_feedbacks(loading_feedback.data())) {
+        robot_feedback.loading_belt_angle = loading_feedback[2];
     }
     float latest_arm_hight_motor_angle = -dc_arm_hight.feedback_value();  // 降下方向を+とする
     bucket_arm.set_height_motor_angle(latest_arm_hight_motor_angle);
@@ -365,7 +367,6 @@ void setup()
     // System setup
     heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
-std::array<float, 4> loading_feedback = {};
 
 /**
  * @brief Run one control cycle and update status heartbeat LED.
@@ -379,6 +380,7 @@ void loop()
     // フィードバック処理
     receive_and_process_feedbacks();
     periodic_feedback();
+    read_button_and_send_debug_pc_packet();
     last_teleop = teleop;
 
     // Basic System Process
