@@ -113,6 +113,7 @@ bool teleop_timeout              = false;
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
 robot_config::feedback_t robot_feedback{};
+robot_config::command_t robot_command{};
 
 /* ----------------------- LED --------------------------*/
 LEDInformation led_info;
@@ -403,6 +404,9 @@ void loop()
         teleop_timeout = true;
         stop_all_actuators();
     }
+    if (ether.receive_operation_data(robot_command)) {
+    }
+
     // フィードバック処理
     receive_and_process_feedbacks();
     periodic_feedback();
