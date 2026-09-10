@@ -52,6 +52,7 @@ constexpr float M3508_GEAR_RATIO = 19.0f;
 constexpr uint32_t HEARTBEAT_TOGGLE_INTERVAL_MS = 500;
 constexpr uint32_t FEEDBACK_INTERVAL_MS         = 100;
 constexpr uint32_t ETHER_INIT_DELAY_MS          = 1000;
+constexpr uint32_t TELEOP_TIMEOUT_MS            = 100;
 /* ---------------------- gn10-can ---------------------- */
 // Device Configuration
 gn10_can::devices::MotorConfig motor_config_wheel;
@@ -106,6 +107,8 @@ BucketArmController bucket_arm(
 /* --------------------- コントローラー（teleop）との通信 ---------------------*/
 robot_config::teleop_t teleop{};
 robot_config::teleop_t last_teleop{};
+uint32_t last_teleop_received_ms = 0;
+bool teleop_timeout              = false;
 
 /* --------------------- PCとの通信 -----------------------------*/
 robot_config::debug_pc_t prev_debug_pc{};
@@ -297,6 +300,16 @@ void receive_and_process_feedbacks()
     led_info.battery_voltage[2] = robot_feedback.drive_battery_voltages;
 }
 
+void stop_all_actuators()
+{
+    std::array<float, 4> esc_target_zero{};
+    esc_wheel.set_targets(esc_target_zero.data());
+    esc_arm_hold_and_loading.set_targets(esc_target_zero.data());
+    dc_arm_height.set_target(0.0f);
+    std::array<bool, 8> solenoid_target_zero{};
+    solenoid.set_target(solenoid_target_zero);
+}
+
 }  // namespace
 
 /**
@@ -374,9 +387,15 @@ void setup()
  */
 void loop()
 {
+    const uint32_t now_ms = HAL_GetTick();
     // 指令値取得
     if (ether.receive_teleop(teleop)) {
+        teleop_timeout          = false;
+        last_teleop_received_ms = now_ms;
         command_robot_drivers();
+    } else if ((now_ms - last_teleop_received_ms) > TELEOP_TIMEOUT_MS && !teleop_timeout) {
+        teleop_timeout = true;
+        stop_all_actuators();
     }
     // フィードバック処理
     receive_and_process_feedbacks();
