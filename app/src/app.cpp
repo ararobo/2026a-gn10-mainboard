@@ -240,6 +240,7 @@ void command_robot_drivers()
 
     // 装填
     if (belt_launcher_controller.load_a_cloth(arm_hold_and_loading_target[2], HAL_GetTick())) {
+        led_info.belt_initialization = true;
     }
 
     // CAN通信
@@ -262,7 +263,6 @@ void receive_and_process_feedbacks()
     float belt_launcher_initial_angle{};
     if (belt_launcher_client.get_initial_point(belt_launcher_initial_angle)) {
         belt_launcher_controller.set_initial_point(HAL_GetTick());
-        led_info.belt_initialization = true;
     }
     float belt_release_point_velocity{};
     if (belt_launcher_client.get_release_point(belt_release_point_velocity)) {
